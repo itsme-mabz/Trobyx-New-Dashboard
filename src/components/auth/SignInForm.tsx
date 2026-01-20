@@ -6,9 +6,39 @@ import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 
+import useAuthStore from "../../stores/useAuthStore";
+
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  const { login, isLoading, error: authError, clearError } = useAuthStore();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [localError, setLocalError] = useState('');
+
+  const error = authError || localError;
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setLocalError('');
+    clearError();
+
+    if (!formData.email || !formData.password) {
+      setLocalError('Please fill in all fields');
+      return;
+    }
+
+    try {
+      await login(formData);
+      // Redirection is handled in App.tsx via protected/public route logic
+      // checking isAuthenticated state
+    } catch (err) {
+      // Error is set in store
+    }
+  };
   return (
     <div className="flex flex-col flex-1">
       <div className="w-full max-w-md pt-10 mx-auto">
@@ -83,13 +113,17 @@ export default function SignInForm() {
                 </span>
               </div>
             </div>
-            <form>
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(e); }}>
               <div className="space-y-6">
                 <div>
                   <Label>
                     Email <span className="text-error-500">*</span>{" "}
                   </Label>
-                  <Input placeholder="info@gmail.com" />
+                  <Input
+                    placeholder="info@gmail.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
                 </div>
                 <div>
                   <Label>
@@ -99,6 +133,8 @@ export default function SignInForm() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -112,6 +148,7 @@ export default function SignInForm() {
                     </span>
                   </div>
                 </div>
+                {error && <div className="text-sm text-error-500">{error}</div>}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Checkbox checked={isChecked} onChange={setIsChecked} />
@@ -127,8 +164,8 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button className="w-full" size="sm">
-                    Sign in
+                  <Button className="w-full" size="sm" disabled={isLoading} type="submit">
+                    {isLoading ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
               </div>

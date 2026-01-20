@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router";
+import { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -18,16 +19,48 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import useAuthStore from "./stores/useAuthStore";
+import ProtectedRoute from "./components/ProtectedRoute";
+import VerifyEmail from "./pages/AuthPages/VerifyEmail";
 
 export default function App() {
+  const { isAuthenticated, checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    // Check authentication status on app load
+    checkAuth();
+  }, [checkAuth]);
+
   return (
     <>
       <Router>
         <ScrollToTop />
         <Routes>
-          {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+          {/* Public Auth Routes */}
+          <Route
+            path="/signin"
+            element={isAuthenticated ? <Navigate to="/" replace /> : <SignIn />}
+          />
+          <Route
+            path="/signup"
+            element={isAuthenticated ? <Navigate to="/" replace /> : <SignUp />}
+          />
+
+           <Route path="/verify-email" element={<VerifyEmail />} />
+
+          {/* Protected Dashboard Routes */}
+          <Route element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route index path="/" element={
+            <ProtectedRoute>
+
+              <Home />
+            </ProtectedRoute>
+
+              } />
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
@@ -52,10 +85,6 @@ export default function App() {
             <Route path="/line-chart" element={<LineChart />} />
             <Route path="/bar-chart" element={<BarChart />} />
           </Route>
-
-          {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />

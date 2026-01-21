@@ -456,23 +456,23 @@ const FlowSetup: React.FC = () => {
                     <Flowbtn
                         variant="outline"
                         size="sm"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to Flows
                     </Flowbtn>
                 </Link>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Setup Flow</h1>
-                    <p className="text-gray-600">{template.displayName}</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Setup Flow</h1>
+                    <p className="text-gray-600 dark:text-gray-400">{template.displayName}</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 {/* Steps Sidebar */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                        <h3 className="font-semibold text-gray-900 mb-4">Setup Steps</h3>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Setup Steps</h3>
                         <div className="space-y-3">
                             {steps.map((step) => {
                                 const Icon = step.icon;
@@ -482,12 +482,12 @@ const FlowSetup: React.FC = () => {
                                 return (
                                     <div
                                         key={step.id}
-                                        className={`flex items-center gap-3 p-2 rounded-md ${isActive ? 'bg-blue-50 text-blue-700' :
-                                            isCompleted ? 'text-green-600' : 'text-gray-500'
+                                        className={`flex items-center gap-3 p-2 rounded-md transition-colors ${isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' :
+                                            isCompleted ? 'text-green-600 dark:text-green-500' : 'text-gray-500 dark:text-gray-400'
                                             }`}
                                     >
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isActive ? 'bg-blue-100' :
-                                            isCompleted ? 'bg-green-100' : 'bg-gray-100'
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${isActive ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800' :
+                                            isCompleted ? 'bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600'
                                             }`}>
                                             {isCompleted ? (
                                                 <CheckCircle className="w-4 h-4" />
@@ -506,23 +506,23 @@ const FlowSetup: React.FC = () => {
                     </div>
 
                     {/* Template Info */}
-                    <div className="mt-4 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                                <Workflow className="w-4 h-4 text-purple-600" />
+                            <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                                <Workflow className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                             </div>
                             <div>
-                                <h4 className="font-medium text-gray-900">{template.displayName}</h4>
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <h4 className="font-medium text-gray-900 dark:text-white">{template.displayName}</h4>
+                                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                     <Linkedin className="w-3 h-3" />
                                     <span>{template.platform}</span>
                                 </div>
                             </div>
                         </div>
-                        <p className="text-sm text-gray-600">{template.summary}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{template.summary}</p>
 
-                        <div className="mt-3 pt-3 border-t border-gray-100">
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                 <Activity className="w-3 h-3" />
                                 <span>{template.stages?.length || 0} stages</span>
                                 <span>•</span>
@@ -534,20 +534,20 @@ const FlowSetup: React.FC = () => {
 
                 {/* Main Content */}
                 <div className="lg:col-span-3">
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-colors">
                         {/* Step Content */}
                         <div className="p-6">
                             {/* Step 1: Target Audience */}
                             {currentStep === 1 && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <Target className="w-5 h-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold">Target Audience</h2>
+                                        <Target className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Target Audience</h2>
                                     </div>
 
                                     {/* Keywords */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Keywords
                                         </label>
                                         <input
@@ -555,10 +555,10 @@ const FlowSetup: React.FC = () => {
                                             placeholder="e.g., B2B, startup, growth, digital transformation"
                                             value={config.targetingSettings?.keywords || ''}
                                             onChange={(e) => updateConfig('targetingSettings', 'keywords', e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         />
                                         {validationErrors['targetingSettings.keywords'] && (
-                                            <p className="text-sm text-red-600 mt-1">{validationErrors['targetingSettings.keywords']}</p>
+                                            <p className="text-sm text-red-600 dark:text-red-400 mt-1">{validationErrors['targetingSettings.keywords']}</p>
                                         )}
                                     </div>
 
@@ -583,7 +583,7 @@ const FlowSetup: React.FC = () => {
                                                 placeholder="Search industries like Technology, SaaS, Healthcare..."
                                             />
                                             {validationErrors['targetingSettings.industries'] && (
-                                                <p className="text-sm text-red-600 mt-1">{validationErrors['targetingSettings.industries']}</p>
+                                                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{validationErrors['targetingSettings.industries']}</p>
                                             )}
                                         </div>
 
@@ -605,7 +605,7 @@ const FlowSetup: React.FC = () => {
                                                 placeholder="CEO, CTO... (or leave blank for broader targeting)"
                                             />
                                             {validationErrors['targetingSettings.jobTitles'] && (
-                                                <p className="text-sm text-red-600 mt-1">{validationErrors['targetingSettings.jobTitles']}</p>
+                                                <p className="text-sm text-red-600 dark:text-red-400 mt-1">{validationErrors['targetingSettings.jobTitles']}</p>
                                             )}
                                         </div>
                                     </div>
@@ -628,7 +628,7 @@ const FlowSetup: React.FC = () => {
                                             placeholder="Search locations like United States, United Kingdom, Canada..."
                                         />
                                         {validationErrors['targetingSettings.locations'] && (
-                                            <p className="text-sm text-red-600 mt-1">{validationErrors['targetingSettings.locations']}</p>
+                                            <p className="text-sm text-red-600 dark:text-red-400 mt-1">{validationErrors['targetingSettings.locations']}</p>
                                         )}
                                     </div>
 
@@ -639,13 +639,13 @@ const FlowSetup: React.FC = () => {
                             {currentStep === 2 && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <MessageCircle className="w-5 h-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold">Messaging & Tone</h2>
+                                        <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Messaging & Tone</h2>
                                     </div>
 
                                     {/* Company Description */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Your Company/Service Description *
                                         </label>
                                         <textarea
@@ -653,13 +653,13 @@ const FlowSetup: React.FC = () => {
                                             placeholder="Describe what your company offers so AI can generate personalized messages..."
                                             value={config.messagingSettings?.companyDescription || ''}
                                             onChange={(e) => updateConfig('messagingSettings', 'companyDescription', e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         />
                                         <div className="flex justify-between mt-1">
                                             {validationErrors['messagingSettings.companyDescription'] && (
-                                                <p className="text-sm text-red-600">{validationErrors['messagingSettings.companyDescription']}</p>
+                                                <p className="text-sm text-red-600 dark:text-red-400">{validationErrors['messagingSettings.companyDescription']}</p>
                                             )}
-                                            <p className="text-xs text-gray-500 ml-auto">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 ml-auto">
                                                 {(config.messagingSettings?.companyDescription?.length || 0)}/500 characters (min 50)
                                             </p>
                                         </div>
@@ -667,13 +667,13 @@ const FlowSetup: React.FC = () => {
 
                                     {/* Message Tone */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Message Tone
                                         </label>
                                         <select
                                             value={config.messagingSettings?.messageTone || 'Professional'}
                                             onChange={(e) => updateConfig('messagingSettings', 'messageTone', e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         >
                                             <option value="Professional">Professional</option>
                                             <option value="Casual">Casual</option>
@@ -686,13 +686,13 @@ const FlowSetup: React.FC = () => {
 
                                     {/* Connection Request Style */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Connection Request Approach
                                         </label>
                                         <select
                                             value={config.messagingSettings?.connectionRequestStyle || 'Value-First'}
                                             onChange={(e) => updateConfig('messagingSettings', 'connectionRequestStyle', e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         >
                                             <option value="Value-First">Value-First</option>
                                             <option value="Common Interest">Common Interest</option>
@@ -704,13 +704,13 @@ const FlowSetup: React.FC = () => {
 
                                     {/* Comment Style */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Comment Strategy
                                         </label>
                                         <select
                                             value={config.messagingSettings?.commentStyle || 'Add Insights'}
                                             onChange={(e) => updateConfig('messagingSettings', 'commentStyle', e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         >
                                             <option value="Add Insights">Add Insights</option>
                                             <option value="Ask Questions">Ask Questions</option>
@@ -726,19 +726,19 @@ const FlowSetup: React.FC = () => {
                             {currentStep === 3 && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <Clock className="w-5 h-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold">Execution & Scheduling</h2>
+                                        <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Execution & Scheduling</h2>
                                     </div>
 
                                     {/* Runs Per Day */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Daily Execution Frequency *
                                         </label>
                                         <select
                                             value={config.executionSettings?.runsPerDay || 2}
                                             onChange={(e) => updateConfig('executionSettings', 'runsPerDay', parseInt(e.target.value))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         >
                                             <option value={1}>1 time per day</option>
                                             <option value={2}>2 times per day</option>
@@ -746,13 +746,13 @@ const FlowSetup: React.FC = () => {
                                             <option value={4}>4 times per day</option>
                                         </select>
                                         {validationErrors['executionSettings.runsPerDay'] && (
-                                            <p className="text-sm text-red-600 mt-1">{validationErrors['executionSettings.runsPerDay']}</p>
+                                            <p className="text-sm text-red-600 dark:text-red-400 mt-1">{validationErrors['executionSettings.runsPerDay']}</p>
                                         )}
                                     </div>
 
                                     {/* Prospects Per Run */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Prospects per Run
                                         </label>
                                         <input
@@ -761,19 +761,19 @@ const FlowSetup: React.FC = () => {
                                             max="15"
                                             value={config.executionSettings?.prospectsPerRun || 10}
                                             onChange={(e) => updateConfig('executionSettings', 'prospectsPerRun', parseInt(e.target.value))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         />
-                                        <p className="text-xs text-gray-500 mt-1">Between 5-15 prospects per execution</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Between 5-15 prospects per execution</p>
                                     </div>
 
                                     {/* Working Hours */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Working Hours *
                                         </label>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">Start Time</label>
+                                                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Start Time</label>
                                                 <input
                                                     type="time"
                                                     value={config.executionSettings?.workingHours?.start || '09:00'}
@@ -781,11 +781,11 @@ const FlowSetup: React.FC = () => {
                                                         ...config.executionSettings?.workingHours,
                                                         start: e.target.value
                                                     })}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-xs text-gray-500 mb-1">End Time</label>
+                                                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">End Time</label>
                                                 <input
                                                     type="time"
                                                     value={config.executionSettings?.workingHours?.end || '17:00'}
@@ -793,18 +793,18 @@ const FlowSetup: React.FC = () => {
                                                         ...config.executionSettings?.workingHours,
                                                         end: e.target.value
                                                     })}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                    className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                                 />
                                             </div>
                                         </div>
                                         {validationErrors['executionSettings.workingHours'] && (
-                                            <p className="text-sm text-red-600 mt-1">{validationErrors['executionSettings.workingHours']}</p>
+                                            <p className="text-sm text-red-600 dark:text-red-400 mt-1">{validationErrors['executionSettings.workingHours']}</p>
                                         )}
                                     </div>
 
                                     {/* Timezone */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                             Timezone
                                         </label>
                                         <select
@@ -813,7 +813,7 @@ const FlowSetup: React.FC = () => {
                                                 ...config.executionSettings?.workingHours,
                                                 timezone: e.target.value
                                             })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition-colors"
                                         >
                                             <option value="America/New_York">Eastern Time (ET)</option>
                                             <option value="America/Chicago">Central Time (CT)</option>
@@ -832,11 +832,11 @@ const FlowSetup: React.FC = () => {
                                                 type="checkbox"
                                                 checked={config.executionSettings?.enableWeekends || false}
                                                 onChange={(e) => updateConfig('executionSettings', 'enableWeekends', e.target.checked)}
-                                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                className="rounded border-gray-300 dark:border-gray-600 text-brand-600 focus:ring-brand-500 dark:bg-gray-700"
                                             />
-                                            <span className="text-sm font-medium text-gray-700">Run on Weekends</span>
+                                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Run on Weekends</span>
                                         </label>
-                                        <p className="text-xs text-gray-500 ml-6">Allow flow execution during weekends</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 ml-6">Allow flow execution during weekends</p>
                                     </div>
                                 </div>
                             )}
@@ -845,48 +845,48 @@ const FlowSetup: React.FC = () => {
                             {currentStep === 4 && (
                                 <div className="space-y-6">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <CheckCircle className="w-5 h-5 text-blue-600" />
-                                        <h2 className="text-xl font-semibold">Review Configuration</h2>
+                                        <CheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Review Configuration</h2>
                                     </div>
 
                                     {/* Configuration Summary */}
                                     <div className="space-y-4">
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <h3 className="font-medium text-gray-900 mb-2">Target Audience</h3>
-                                            <div className="space-y-1 text-sm text-gray-600">
-                                                <p><strong>Industries:</strong> {config.targetingSettings?.industries?.join(', ') || 'None selected'}</p>
-                                                <p><strong>Job Titles:</strong> {config.targetingSettings?.jobTitles?.join(', ') || 'None selected'}</p>
-                                                <p><strong>Locations:</strong> {config.targetingSettings?.locations?.join(', ') || 'None selected'}</p>
+                                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
+                                            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Target Audience</h3>
+                                            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Industries:</strong> {config.targetingSettings?.industries?.join(', ') || 'None selected'}</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Job Titles:</strong> {config.targetingSettings?.jobTitles?.join(', ') || 'None selected'}</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Locations:</strong> {config.targetingSettings?.locations?.join(', ') || 'None selected'}</p>
                                             </div>
                                         </div>
 
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <h3 className="font-medium text-gray-900 mb-2">Messaging Settings</h3>
-                                            <div className="space-y-1 text-sm text-gray-600">
-                                                <p><strong>Tone:</strong> {config.messagingSettings?.messageTone || 'Professional'}</p>
-                                                <p><strong>Connection Style:</strong> {config.messagingSettings?.connectionRequestStyle || 'Value-First'}</p>
-                                                <p><strong>Comment Style:</strong> {config.messagingSettings?.commentStyle || 'Add Insights'}</p>
+                                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
+                                            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Messaging Settings</h3>
+                                            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Tone:</strong> {config.messagingSettings?.messageTone || 'Professional'}</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Connection Style:</strong> {config.messagingSettings?.connectionRequestStyle || 'Value-First'}</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Comment Style:</strong> {config.messagingSettings?.commentStyle || 'Add Insights'}</p>
                                             </div>
                                         </div>
 
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                            <h3 className="font-medium text-gray-900 mb-2">Execution Settings</h3>
-                                            <div className="space-y-1 text-sm text-gray-600">
-                                                <p><strong>Frequency:</strong> {config.executionSettings?.runsPerDay || 2} times per day</p>
-                                                <p><strong>Prospects per Run:</strong> {config.executionSettings?.prospectsPerRun || 10}</p>
-                                                <p><strong>Working Hours:</strong> {config.executionSettings?.workingHours?.start || '09:00'} - {config.executionSettings?.workingHours?.end || '17:00'}</p>
-                                                <p><strong>Weekends:</strong> {config.executionSettings?.enableWeekends ? 'Enabled' : 'Disabled'}</p>
+                                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
+                                            <h3 className="font-medium text-gray-900 dark:text-white mb-2">Execution Settings</h3>
+                                            <div className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Frequency:</strong> {config.executionSettings?.runsPerDay || 2} times per day</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Prospects per Run:</strong> {config.executionSettings?.prospectsPerRun || 10}</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Working Hours:</strong> {config.executionSettings?.workingHours?.start || '09:00'} - {config.executionSettings?.workingHours?.end || '17:00'}</p>
+                                                <p><strong className="text-gray-900 dark:text-gray-200">Weekends:</strong> {config.executionSettings?.enableWeekends ? 'Enabled' : 'Disabled'}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Important Notice */}
-                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                                         <div className="flex items-start gap-3">
-                                            <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+                                            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                                             <div className="flex-1">
-                                                <h4 className="font-medium text-blue-900 mb-1">Ready to Start</h4>
-                                                <p className="text-sm text-blue-700">
+                                                <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-1">Ready to Start</h4>
+                                                <p className="text-sm text-blue-700 dark:text-blue-400">
                                                     Your flow will begin executing within 5 minutes. You can pause, resume, or stop the flow at any time from the Flows dashboard.
                                                 </p>
                                             </div>
@@ -897,11 +897,12 @@ const FlowSetup: React.FC = () => {
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="px-6 py-4 border-t border-gray-200 flex justify-between">
+                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-between bg-gray-50/[0.3] dark:bg-gray-800 rounded-b-lg">
                             <Flowbtn
                                 onClick={handlePrevious}
                                 variant="outline"
                                 disabled={currentStep === 1}
+                                className="dark:bg-transparent dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
                             >
                                 Previous
                             </Flowbtn>

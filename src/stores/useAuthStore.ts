@@ -26,7 +26,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     token: localStorage.getItem('accessToken'),
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: !!localStorage.getItem('accessToken'),
     error: null,
 
     // Actions
@@ -178,44 +178,64 @@ const useAuthStore = create<AuthState>((set, get) => ({
 
     checkAuth: async () => {
         const token = localStorage.getItem('accessToken');
+        const { isAuthenticated, user } = get();
 
-        // Strict check for token existence and validity
-        if (!token || token === 'undefined' || token === 'null') {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            set({ isAuthenticated: false, isLoading: false, user: null, token: null });
+        if (!token) {
+            if (isAuthenticated || user !== null) {
+                set({
+                    isAuthenticated: false,
+                    user: null,
+                    token: null,
+                    isLoading: false,
+                });
+            }
             return;
         }
 
-        // We have a token, verify it
         try {
-            set({ isLoading: true });
+            set(state => state.isLoading ? state : { isLoading: true });
 
             const response = await fetch('/api/auth/me', {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                set({
-                    user: data.data.user,
-                    isAuthenticated: true,
-                    isLoading: false,
-                    token
-                });
-            } else {
-                throw new Error('Token invalid');
+            if (!response.ok) throw new Error('Invalid token');
+
+            const data = await response.json();
+
+            // 🔑 GUARD AGAINST SAME DATA
+            if (
+                get().isAuthenticated &&
+                get().user?.id === data.data.user.id
+            ) {
+                set({ isLoading: false });
+                return;
             }
-        } catch (error) {
-            console.error("Auth check failed:", error);
+
+            set({
+                user: data.data.user,
+                isAuthenticated: true,
+                token,
+                isLoading: false,
+            });
+        } catch {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            set({ isAuthenticated: false, isLoading: false, user: null, token: null });
+
+            if (get().isAuthenticated || get().user !== null) {
+                set({
+                    isAuthenticated: false,
+                    user: null,
+                    token: null,
+                    isLoading: false,
+                });
+            }
         }
     }
+
 }));
 
 export default useAuthStore;

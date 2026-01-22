@@ -131,16 +131,34 @@ export const getFlowTemplate = (templateId: string): Promise<ApiResponse<{ flow:
  * @param {string} name - Optional flow name
  * @returns {Promise<ApiResponse<{ flow: UserFlow }>>} Started flow response
  */
-export const startFlow = (
+export const startFlow = async (
   templateId: string,
   config: Record<string, any>,
   name: string | null = null
 ): Promise<ApiResponse<{ flow: UserFlow }>> => {
-  return apiPost<{ flow: UserFlow }>('/flows', {
-    templateId,
-    config,
-    name
+  const FLOW_API_URL = 'http://192.168.1.56:3000/api/flows';
+  const token = localStorage.getItem('accessToken');
+
+  const response = await fetch(FLOW_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      templateId,
+      name,
+      config
+    })
   });
+
+  const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to start flow');
+  }
+
+  return data;
 };
 
 /**

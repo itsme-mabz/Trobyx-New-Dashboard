@@ -22,6 +22,9 @@ import FlowAnalytics from './pages/Flows/FlowAnalytics';
 import FlowActivities from './pages/Flows/FlowActivities';
 import FlowProspects from './pages/Flows/FlowProspects';
 import FlowProspectDetail from './pages/Flows/FlowProspectDetail';
+import UserProfiles from './pages/UserProfiles';
+import Trobs from './pages/Trobs/Trobs';
+import TrobDetail from './pages/Trobs/TrobDetail';
 
 // Automations (Placeholder imports - assuming these exist or will be created, falling back to basic checks if not)
 // Since I can't verify all, I will comment out ones I'm unsure of or map them to existing pages if possible. 
@@ -90,6 +93,20 @@ function App() {
           <Route path="flows/:flowId/prospects" element={<FlowProspects />} />
           <Route path="flows/:flowId/prospects/:prospectId" element={<FlowProspectDetail />} />
 
+          <Route path="profile-settings" element={<UserProfiles />} />
+
+          <Route path="/trobs" element={<Trobs />} />
+
+          <Route path="/trobs/:trobId" element={<TrobDetail />} />
+
+
+          <Route path="/automations/active" element={<TrobDetail />} />
+
+
+
+
+
+
 
         </Route>
 
@@ -100,6 +117,9 @@ function App() {
       {/* Toast notifications */}
       <Toaster
         position="top-right"
+        containerStyle={{
+          zIndex: 99999,
+        }}
         toastOptions={{
           duration: 4000,
           style: {

@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface User {
     [key: string]: any;
 }
@@ -39,7 +41,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     login: async (credentials) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(credentials),
@@ -84,7 +86,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
         try {
             const token = localStorage.getItem('accessToken');
             if (token) {
-                await fetch('/api/auth/logout', {
+                await fetch(`${API_BASE_URL}/api/auth/logout`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -111,7 +113,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     register: async (userData) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData),
@@ -160,7 +162,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
         if (!token) return;
 
         try {
-            const response = await fetch('/api/auth/me', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -195,7 +197,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
         try {
             set(state => state.isLoading ? state : { isLoading: true });
 
-            const response = await fetch('/api/auth/me', {
+            const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',

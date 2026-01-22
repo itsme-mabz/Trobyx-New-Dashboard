@@ -15,7 +15,7 @@ import {
   TableIcon,
   UserCircleIcon,
 } from "../icons";
-import { Workflow } from "lucide-react";
+import { Workflow, Zap } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
 
@@ -36,6 +36,11 @@ const navItems: NavItem[] = [
     icon: <Workflow className="w-[24px] h-[24px]" />,
     name: "Flows",
     path: "/flows",
+  },
+  {
+    icon: <Zap className="w-[24px] h-[24px]" />,
+    name: "Trobs",
+    path: "/trobs",
   },
   {
     icon: <CalenderIcon />,

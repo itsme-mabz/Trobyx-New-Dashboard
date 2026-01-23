@@ -1,0 +1,104 @@
+input:focus,
+button:focus,
+textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+
+.header-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  border-radius: 9999px; 
+  background: white;
+  padding: 6px 10px;
+}
+
+.header-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+}
+
+.header-search-hide {
+  width: 0;
+  padding: 0;
+  opacity: 0;
+}
+
+.header-search-show {
+  width: 180px; /* you can increase */
+  opacity: 1;
+}
+
+/* Messages.css - Add these styles */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scrollbar styling */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Header search animation */
+.header-search-container {
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-search-show {
+  width: 200px;
+  opacity: 1;
+}
+
+.header-search-hide {
+  width: 0;
+  opacity: 0;
+}
+
+.header-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .chat-container .bg-white {
+    display: none;
+  }
+} 

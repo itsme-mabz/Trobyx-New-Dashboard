@@ -88,12 +88,12 @@ export const apiCall = async <T = any>(
     if (response.status === 401) {
       // Clear auth state and redirect to login
       await authStore.logout();
-      
+
       // Redirect to login page
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
-      
+
       throw new ApiError('Your session has expired. Please log in again.', 401, null);
     }
 
@@ -103,8 +103,8 @@ export const apiCall = async <T = any>(
     // Handle other non-200 responses
     if (!response.ok) {
       throw new ApiError(
-        data.message || 'Request failed', 
-        response.status, 
+        data.message || 'Request failed',
+        response.status,
         data
       );
     }
@@ -147,8 +147,8 @@ export const apiGet = <T = any>(endpoint: string, options: ApiCallOptions = {}):
  * @returns {Promise<ApiResponse>} API response
  */
 export const apiPost = <T = any>(
-  endpoint: string, 
-  data?: any, 
+  endpoint: string,
+  data?: any,
   options: ApiCallOptions = {}
 ): Promise<ApiResponse<T>> => {
   return apiCall<T>(endpoint, {
@@ -166,8 +166,8 @@ export const apiPost = <T = any>(
  * @returns {Promise<ApiResponse>} API response
  */
 export const apiPut = <T = any>(
-  endpoint: string, 
-  data?: any, 
+  endpoint: string,
+  data?: any,
   options: ApiCallOptions = {}
 ): Promise<ApiResponse<T>> => {
   return apiCall<T>(endpoint, {
@@ -184,7 +184,7 @@ export const apiPut = <T = any>(
  * @returns {Promise<ApiResponse>} API response
  */
 export const apiDelete = <T = any>(
-  endpoint: string, 
+  endpoint: string,
   options: ApiCallOptions = {}
 ): Promise<ApiResponse<T>> => {
   return apiCall<T>(endpoint, { method: 'DELETE', ...options });

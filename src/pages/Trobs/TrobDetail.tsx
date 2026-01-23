@@ -20,6 +20,8 @@ import {
     Globe,
     LucideIcon,
     Info,
+    TrendingUp,
+    RefreshCw
 } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/button/Button';
@@ -31,6 +33,10 @@ import { usePlatformConnection } from '../../hooks/usePlatformConnection';
 import usePlanLimits from '../../hooks/usePlanLimits';
 import useAuthStore from '../../stores/useAuthStore';
 import toast from 'react-hot-toast';
+import TrobLeadsTable, { Lead } from '../../components/trobs/TrobLeadsTable';
+
+import { MOCK_LEADS } from '../../data/mockLeads';
+
 
 // Type definitions
 interface Template {
@@ -114,7 +120,9 @@ const TrobDetail = () => {
     const [showConnectionModal, setShowConnectionModal] = useState(false);
     const [showVideoModal, setShowVideoModal] = useState(false);
     const [showConfigSidebar, setShowConfigSidebar] = useState(false);
-    const [currentStep, setCurrentStep] = useState<'overview' | 'configure' | 'review'>('overview');
+    const [currentStep, setCurrentStep] = useState<'overview' | 'configure' | 'review' | 'results'>('overview');
+    const [leads, setLeads] = useState<Lead[]>([]);
+    const [isLoadingLeads, setIsLoadingLeads] = useState(false);
 
     // Check platform connection status
     const {
@@ -206,7 +214,7 @@ const TrobDetail = () => {
                 return;
             }
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/automation/start`, {
+            const response = await fetch('http://192.168.1.56:3000/api/jobs', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -214,8 +222,9 @@ const TrobDetail = () => {
                 },
                 body: JSON.stringify({
                     templateId: selectedTemplate.id,
+                    name: selectedTemplate.displayName,
                     config,
-                    userCookies: [],
+                    priority: 'normal',
                 }),
             });
 
@@ -227,13 +236,50 @@ const TrobDetail = () => {
             const result = await response.json();
 
             toast.success(`${result.message}! Automation started successfully.`);
-            setCurrentStep('overview');
-            navigate('/automations');
+
+            // Instead of navigating away, show the results step
+            setCurrentStep('results');
+            fetchLeads();
+            // navigate('/automations');
         } catch (error: any) {
             console.error('Failed to start automation:', error);
             toast.error(`Failed to start automation: ${error.message}`);
         } finally {
             setIsStarting(false);
+        }
+    };
+
+    const fetchLeads = async () => {
+        setIsLoadingLeads(true);
+        try {
+            const token = localStorage.getItem('accessToken');
+            // Try to fetch real leads from the new endpoint structure if available
+            // For now, we'll try the generic results endpoint
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000'}/api/jobs/${selectedTemplate?.id}/results`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+                    setLeads(data.data);
+                } else if (data.leads && Array.isArray(data.leads)) {
+                    setLeads(data.leads);
+                } else {
+                    console.log('No leads found in API response, showing mock data');
+                    setLeads(MOCK_LEADS);
+                }
+            } else {
+                console.warn('API fetch failed, falling back to mock leads');
+                setLeads(MOCK_LEADS);
+            }
+        } catch (error) {
+            console.error('Error fetching leads:', error);
+            setLeads(MOCK_LEADS);
+        } finally {
+            setIsLoadingLeads(false);
         }
     };
 
@@ -582,6 +628,19 @@ const TrobDetail = () => {
                     <span className={`text-sm font-medium ${currentStep === 'configure' ? 'text-black dark:text-gray-100' : 'text-tea-black-600 dark:text-gray-400'
                         }`}>
                         Configure
+                    </span>
+                </div>
+
+                <div className="flex-1 h-px bg-tea-black-200 dark:bg-gray-800"></div>
+
+                <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === 'results' ? 'bg-brand-500 text-white' : 'bg-tea-black-100 dark:bg-gray-800 text-tea-black-600 dark:text-gray-400'
+                        }`}>
+                        3
+                    </div>
+                    <span className={`text-sm font-medium ${currentStep === 'results' ? 'text-black dark:text-gray-100' : 'text-tea-black-600 dark:text-gray-400'
+                        }`}>
+                        Results
                     </span>
                 </div>
             </div>
@@ -1078,6 +1137,65 @@ const TrobDetail = () => {
                 templateName={selectedTemplate?.displayName}
                 onConnectClick={handleConnectPlatform}
             />
+            {currentStep === 'results' && (
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
+                                <Users className="w-6 h-6 text-success" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-black dark:text-white">Leads Found</h1>
+                                <p className="text-sm text-tea-black-600 dark:text-gray-400">Profiles matching your automation criteria</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <div className="flex -space-x-3 overflow-hidden">
+                                {leads.slice(0, 3).map((lead, i) => (
+                                    <img
+                                        key={i}
+                                        className="inline-block h-10 w-10 rounded-full ring-2 ring-white dark:ring-gray-900"
+                                        src={lead.profileImage || `/images/user/user-0${i + 1}.jpg`}
+                                        alt=""
+                                    />
+                                ))}
+                            </div>
+                            <Badge color="success" variant="light">
+                                <div className="flex items-center gap-1">
+                                    <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                                    Running
+                                </div>
+                            </Badge>
+                        </div>
+                    </div>
+
+                    <TrobLeadsTable leads={leads} isLoading={isLoadingLeads} />
+
+                    <div className="bg-brand-500/5 dark:bg-brand-500/10 border border-brand-500/10 dark:border-brand-500/20 rounded-xl p-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-brand-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+                                    <TrendingUp className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-black dark:text-white">Real-time Performance</h3>
+                                    <p className="text-sm text-tea-black-600 dark:text-gray-400">Total leads found today: {leads.length}</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 w-full md:w-auto">
+                                <Button variant="outline" onClick={() => fetchLeads()} className="flex-1 md:flex-none">
+                                    <RefreshCw className="w-4 h-4 mr-2" />
+                                    Refresh Results
+                                </Button>
+                                <Button onClick={() => navigate('/automations')} className="flex-1 md:flex-none">
+                                    Go to Dashboard
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -25,8 +25,11 @@ import FlowProspectDetail from './pages/Flows/FlowProspectDetail';
 import UserProfiles from './pages/UserProfiles';
 import Trobs from './pages/Trobs/Trobs';
 import TrobDetail from './pages/Trobs/TrobDetail';
-
-// Automations (Placeholder imports - assuming these exist or will be created, falling back to basic checks if not)
+import Messages from './pages/Messages/Messages';
+import ActiveAutomations from './pages/Automations/ActiveAutomations';
+import CompletedAutomations from './pages/Automations/CompletedAutomations';
+import Platforms from './pages/platforms/Platforms';
+import Pricing from './pages/Pricing/Pricing';
 // Since I can't verify all, I will comment out ones I'm unsure of or map them to existing pages if possible. 
 // However, the user explicitly asked for these routes. I will include them and if they fail, the user will see.
 // But valid paths are critical.
@@ -100,7 +103,17 @@ function App() {
           <Route path="/trobs/:trobId" element={<TrobDetail />} />
 
 
-          <Route path="/automations/active" element={<TrobDetail />} />
+          <Route path="/automations/active" element={<ActiveAutomations />} />
+          <Route path="/automations/completed" element={<CompletedAutomations />} />
+
+          <Route path="/messages" element={<Messages />} />
+
+
+          <Route path="/connections" element={<Platforms/>} />
+
+          <Route path="/pricing" element={<Pricing/>} />
+
+
 
 
 

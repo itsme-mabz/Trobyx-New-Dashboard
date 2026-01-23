@@ -1,23 +1,57 @@
+import useAuthStore from "../stores/useAuthStore";
+
 export default function SidebarWidget() {
+  const { user } = useAuthStore();
+
+  const currentPlan = user?.plan?.toLowerCase() || "trial";
+
+  const getButtonText = () => {
+    if (currentPlan === "pro") return "Upgrade Plan";
+    if (currentPlan === "plus") return null;
+    return "Purchase Plan";
+  };
+
+  const buttonText = getButtonText();
+
   return (
-    <div
-      className={`
-        mx-auto mb-10 w-full max-w-60 rounded-2xl bg-gray-50 px-4 py-5 text-center dark:bg-white/[0.03]`}
-    >
-      <h3 className="mb-2 font-semibold text-gray-900 dark:text-white">
-        #1 Tailwind CSS Dashboard
-      </h3>
-      <p className="mb-4 text-gray-500 text-theme-sm dark:text-gray-400">
-        Leading Tailwind CSS Admin Template with 400+ UI Component and Pages.
-      </p>
-      <a
-        href="https://tailadmin.com/pricing"
-        target="_blank"
-        rel="nofollow"
-        className="flex items-center justify-center p-3 font-medium text-white rounded-lg bg-brand-500 text-theme-sm hover:bg-brand-600"
-      >
-        Purchase Plan
-      </a>
+    <div className={`mx-auto mb-10 w-full max-w-60 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 dark:from-brand-600 dark:to-brand-700 p-5 shadow-xl shadow-brand-500/20 dark:shadow-brand-900/30 relative overflow-hidden ${
+      buttonText ? 'min-h-[160px]' : ''
+    }`}>
+      
+      {/* glass shine */}
+      <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-tr from-white/0 via-white/5 to-white/0 rotate-45 pointer-events-none"></div>
+
+      {/* FLEX CONTAINER */}
+      <div className={`relative z-10 flex flex-col h-full text-center pt-2 ${
+        !buttonText ? 'justify-center' : ''
+      }`}>
+        
+        <h3 className="mb-4 font-bold text-white text-lg tracking-tight">
+          {currentPlan === "plus"
+            ? "Plus Active"
+            : `${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} Plan`}
+        </h3>
+
+        {buttonText && (
+          <p className="text-white/80 dark:text-white/70 text-sm">
+            {currentPlan === "trial"
+              ? "Upgrade for more features."
+              : "Advanced premium features."}
+          </p>
+        )}
+
+        {/* BUTTON STAYS VISIBLE */}
+        {buttonText && (
+          <div className="mt-auto pt-4">
+            <a
+              href="/pricing"
+              className="flex items-center justify-center w-full p-3 font-bold text-brand-700 dark:text-brand-800 bg-white dark:bg-gray-100 rounded-xl text-sm transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-200 hover:shadow-lg active:scale-95 shadow-md shadow-black/10"
+            >
+              {buttonText}
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

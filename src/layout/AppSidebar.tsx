@@ -15,108 +15,137 @@ import {
   TableIcon,
   UserCircleIcon,
 } from "../icons";
-import { Workflow, Zap } from "lucide-react";
+import { Workflow, Zap, MessageSquare, Layers, HelpCircle, LogOut, Link2, DollarSign } from "lucide-react";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
+import useAuthStore from "../stores/useAuthStore";
+import toast from "react-hot-toast";
 
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  onClick?: () => void;
+  isExternal?: boolean;
 };
-
-const navItems: NavItem[] = [
-  {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
-  },
-  {
-    icon: <Workflow className="w-[24px] h-[24px]" />,
-    name: "Flows",
-    path: "/flows",
-  },
-  {
-    icon: <Zap className="w-[24px] h-[24px]" />,
-    name: "Trobs",
-    path: "/trobs",
-  },
-  {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
-  },
-  {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
-  },
-  {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
-    ],
-  },
-];
-
-const othersItems: NavItem[] = [
-  {
-    icon: <PieChartIcon />,
-    name: "Charts",
-    subItems: [
-      { name: "Line Chart", path: "/line-chart", pro: false },
-      { name: "Bar Chart", path: "/bar-chart", pro: false },
-    ],
-  },
-  {
-    icon: <BoxCubeIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
-  },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
-];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { logout } = useAuthStore();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
     type: "main" | "others";
     index: number;
   } | null>(null);
-  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
-    {}
-  );
+
+  const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // const isActive = (path: string) => location.pathname === path;
+  const handleSignOut = () => {
+    toast.custom((t) => (
+      <div
+        className={`${t.visible ? "animate-enter" : "animate-leave"
+          } max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5`}
+      >
+        <div className="flex-1 w-0 p-4">
+          <div className="flex items-start">
+            <div className="flex-shrink-0 pt-0.5">
+              <LogOut className="h-10 w-10 text-red-500 bg-red-50 dark:bg-red-900/20 p-2 rounded-full" />
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                Sign Out Confirmation
+              </p>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Are you sure you want to end your session?
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex border-l border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => {
+              logout();
+              toast.dismiss(t.id);
+              toast.success("Signed out successfully");
+            }}
+            className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-semibold text-red-600 hover:text-red-500 focus:outline-none"
+          >
+            Sign Out
+          </button>
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="w-full border border-transparent rounded-none p-4 flex items-center justify-center text-sm font-semibold text-gray-700 dark:text-gray-400 hover:text-gray-500 focus:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ));
+  };
+
+  const navItems: NavItem[] = [
+    {
+      icon: <GridIcon />,
+      name: "Dashboard",
+      path: "/dashboard",
+    },
+    {
+      icon: <Workflow className="w-[24px] h-[24px]" />,
+      name: "Flows",
+      path: "/flows",
+    },
+    {
+      icon: <Zap className="w-[24px] h-[24px]" />,
+      name: "Trobs",
+      path: "/trobs",
+    },
+    {
+      icon: <Layers className="size-6" />,
+      name: "Automation",
+      subItems: [
+        { name: "Active Jobs", path: "/automations/active", pro: false },
+        { name: "Completed Jobs", path: "/automations/completed", pro: false },
+      ],
+    },
+    {
+      icon: <MessageSquare className="w-[24px] h-[24px]" />,
+      name: "Messages",
+      path: "/messages",
+    },
+    {
+      icon: <Link2 className="w-[24px] h-[24px]" />,
+      name: "Connections",
+      path: "/connections",
+    },
+    {
+      icon: <DollarSign className="w-[24px] h-[24px]" />,
+      name: "Pricing",
+      path: "/pricing",
+    },
+    {
+      icon: <UserCircleIcon />,
+      name: "User Profile",
+      path: "/profile-settings",
+    },
+  ];
+
+  const othersItems: NavItem[] = [
+    {
+      icon: <HelpCircle className="size-6" />,
+      name: "Help and Support",
+      path: "https://trobyx.com/help",
+      isExternal: true,
+    },
+    {
+      icon: <LogOut className="size-6" />,
+      name: "Sign Out",
+      onClick: handleSignOut,
+    },
+  ];
+
   const isActive = useCallback(
     (path: string) => location.pathname === path,
     [location.pathname]
@@ -207,8 +236,22 @@ const AppSidebar: React.FC = () => {
                 />
               )}
             </button>
-          ) : (
-            nav.path && (
+          ) : nav.path ? (
+            nav.isExternal ? (
+              <a
+                href={nav.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="menu-item group menu-item-inactive"
+              >
+                <span className="menu-item-icon-size menu-item-icon-inactive">
+                  {nav.icon}
+                </span>
+                {(isExpanded || isHovered || isMobileOpen) && (
+                  <span className="menu-item-text">{nav.name}</span>
+                )}
+              </a>
+            ) : (
               <Link
                 to={nav.path}
                 className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
@@ -227,6 +270,18 @@ const AppSidebar: React.FC = () => {
                 )}
               </Link>
             )
+          ) : (
+            <button
+              onClick={nav.onClick}
+              className="menu-item group menu-item-inactive w-full text-left"
+            >
+              <span className="menu-item-icon-size menu-item-icon-inactive">
+                {nav.icon}
+              </span>
+              {(isExpanded || isHovered || isMobileOpen) && (
+                <span className="menu-item-text">{nav.name}</span>
+              )}
+            </button>
           )}
           {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
             <div
@@ -308,22 +363,22 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/trobyx.svg"
                 alt="Logo"
-                width={150}
+                width={120}
                 height={40}
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/trobyx.svg"
                 alt="Logo"
-                width={150}
+                width={120}
                 height={40}
               />
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/trobyx.svg"
               alt="Logo"
               width={32}
               height={32}
@@ -349,21 +404,7 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "justify-start"
-                  }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Others"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
-            </div>
+            {renderMenuItems(othersItems, "others")}
           </div>
         </nav>
         {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}

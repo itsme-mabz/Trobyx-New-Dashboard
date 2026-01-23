@@ -106,7 +106,7 @@ class SocketClient {
   onAutomationProgress(callback: (data: any) => void): () => void {
     if (!this.socket) {
       console.warn('Socket not initialized, call connect() first');
-      return () => {};
+      return () => { };
     }
 
     this.socket.on('automation-progress', callback);
@@ -125,7 +125,7 @@ class SocketClient {
   onJobProgress(callback: (data: any) => void): () => void {
     if (!this.socket) {
       console.warn('Socket not initialized, call connect() first');
-      return () => {};
+      return () => { };
     }
 
     this.socket.on('jobProgress', callback);

@@ -4,7 +4,7 @@ import {
     MessageCircle,
     Menu,
     Search,
-    ArrowBigRight,
+    ArrowLeft,
     X,
     AlertCircle,
     MailOpen,
@@ -710,13 +710,13 @@ function Messages() {
     });
 
     return (
-        <section className='grid grid-cols-1 md:grid-cols-[33%_1fr] w-full h-full bg-[#f0f2f5] dark:bg-gray-900 overflow-hidden chat-container'>
+        <section className='flex md:grid md:grid-cols-[33%_1fr] w-full h-full bg-[#f0f2f5] dark:bg-gray-900 overflow-hidden chat-container'>
             {/* Left sidebar */}
-            <div className='flex flex-col bg-white dark:bg-gray-900 border-r border-[#ddd] dark:border-gray-800 min-h-0'>
+            <div className={`flex flex-col bg-white dark:bg-gray-900 border-r border-[#ddd] dark:border-gray-800 min-h-0 ${selectedContact ? 'hidden md:flex w-full' : 'flex w-full'}`}>
                 {/* Header with sync button */}
                 <div className='flex items-center justify-between p-2'>
                     <div className='w-[45px] h-[45px] rounded-full flex-shrink-0'>
-                        <img src='/public/trobyx.svg' alt='logo' width='45' height='45' />
+                        <img src='/trobyx.svg' alt='logo' width='45' height='45' />
                     </div>
                     <div className='flex items-center gap-4 relative' ref={menuRef}>
                         {/* Sync button */}
@@ -923,10 +923,18 @@ function Messages() {
                 </div>
             </div>
             {/* Right chat area */}
-            <div className="flex flex-col bg-[#efe7dd] dark:bg-[#0b141a] bg-[url('https://web.whatsapp.com/img/bg-chat-tile-dark_0e0e0e5c2f9c3b5c5c5c5c5c5c5c5c.png')] dark:bg-[url('https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e729a2852cf366635f606880.png')] bg-repeat min-h-0">
+            <div className={`flex flex-col bg-[#efe7dd] dark:bg-[#0b141a] bg-[url('https://web.whatsapp.com/img/bg-chat-tile-dark_0e0e0e5c2f9c3b5c5c5c5c5c5c5c5c.png')] dark:bg-[url('https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e729a2852cf366635f606880.png')] bg-repeat min-h-0 ${selectedContact ? 'flex w-full' : 'hidden md:flex'}`}>
                 {/* Chat header */}
                 <div className='h-[70px] min-h-[60px] bg-[#f0f2f5] dark:bg-gray-800 flex justify-between items-center px-4 border-b border-[#ddd] dark:border-gray-700 z-10 relative'>
                     <div className='flex items-center gap-3'>
+                        {selectedContact && (
+                            <button
+                                onClick={() => setSelectedContact(null)}
+                                className='md:hidden p-1 -ml-1 mr-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors'
+                            >
+                                <ArrowLeft className='w-6 h-6 text-gray-600 dark:text-gray-300' />
+                            </button>
+                        )}
                         {selectedContact ? (
                             <>
                                 <div className='w-10 h-10 rounded-full bg-gray-300 overflow-hidden'>
@@ -1035,7 +1043,7 @@ function Messages() {
                                 </p>
                                 <div className='flex items-center gap-2 text-sm text-gray-400'>
                                     <Linkedin className='w-4 h-4' />
-                                    <span>Powered by LinkedIn API</span>
+                                    <span>Secure LinkedIn Integration</span>
                                 </div>
                             </div>
                         ) : messages.length > 0 ? (

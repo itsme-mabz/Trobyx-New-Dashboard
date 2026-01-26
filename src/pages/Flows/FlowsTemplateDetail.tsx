@@ -152,12 +152,13 @@ const FlowTemplateDetail: React.FC = () => {
                         <Flowbtn
                             variant="outline"
                             size="sm"
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 py-3.5"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Back to Flows
                         </Flowbtn>
                     </Link>
+
 
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -180,7 +181,7 @@ const FlowTemplateDetail: React.FC = () => {
                 </div>
 
                 <Link to={`/flows/setup/${templateId}`}>
-                    <Flowbtn className="flex items-center gap-2">
+                    <Flowbtn className="flex items-center gap-2 py-3.5 px-6">
                         <Play className="w-4 h-4" />
                         Start This Flow
                     </Flowbtn>
@@ -416,7 +417,7 @@ const FlowTemplateDetail: React.FC = () => {
                     <Link to={`/flows/setup/${templateId}`}>
                         <Flowbtn
                             size="lg"
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 py-4 px-8"
                         >
                             <Zap className="w-4 h-4" />
                             Start Flow Setup

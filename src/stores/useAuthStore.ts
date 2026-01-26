@@ -21,6 +21,7 @@ interface AuthState {
     clearError: () => void;
     refreshUser: () => Promise<void>;
     checkAuth: () => Promise<void>;
+    updateOnboarding: (step: number) => Promise<any>;
 }
 
 const useAuthStore = create<AuthState>((set, get) => ({
@@ -235,6 +236,43 @@ const useAuthStore = create<AuthState>((set, get) => ({
                     isLoading: false,
                 });
             }
+        }
+    },
+
+    updateOnboarding: async (step: number) => {
+        const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('No access token found');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/onboarding`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ onboardingStep: step }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update onboarding');
+            }
+
+            const data = await response.json();
+
+            // Update local user state if successful - MERGE with existing data
+            if (data.status === "success" || data.data) {
+                const updatedFields = data.data.user || data.data;
+                const currentUser = get().user;
+                set({
+                    user: currentUser ? { ...currentUser, ...updatedFields } : updatedFields
+                });
+            }
+
+            return data;
+        } catch (error: any) {
+            console.error('Onboarding update error:', error);
+            throw error;
         }
     }
 

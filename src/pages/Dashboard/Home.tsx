@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import {
   FileText,
@@ -34,6 +35,7 @@ const Home = () => {
   const { templates, fetchTemplates } = useTemplateStore();
   const { refreshUser } = useAuthStore();
   const { planLimits } = usePlanLimits();
+  const { user } = useAuthStore();
 
   // Local state
   const [platformConnections, setPlatformConnections] = useState<any[]>([]);
@@ -247,22 +249,43 @@ const Home = () => {
               </div>
             </Card>
 
-            <Card>
-              <div className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
-                      Connected Accounts
-                    </p>
-                    <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
-                      {(getPlatformStatus('linkedin') === 'connected' ? 1 : 0) +
-                        (getPlatformStatus('twitter') === 'connected' ? 1 : 0)}
-                    </p>
+            <div
+              className={`relative ${user?.onboardingStep === 3 ? "z-50" : ""}`}
+            >
+              {user?.onboardingStep === 3 && (
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 z-[9999] whitespace-nowrap animate-fade-in-up">
+                  <div className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-[11px] font-bold py-2.5 px-4 rounded-xl shadow-2xl border border-blue-200 dark:border-gray-700 flex items-center gap-4 relative">
+                    <span>Here is status of your connected account</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        useAuthStore.getState().updateOnboarding(4);
+                      }}
+                      className="bg-brand-500 text-white px-2 py-1 rounded-md text-[10px] font-bold hover:bg-brand-600 transition-colors shadow-sm cursor-pointer"
+                    >
+                      OK
+                    </button>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-800 border-r border-b border-blue-200 dark:border-gray-700 rotate-45 -mt-1.5"></div>
                   </div>
-                  <Users className='w-8 h-8 text-indigo-500' />
                 </div>
-              </div>
-            </Card>
+              )}
+              <Card>
+                <div className='p-6'>
+                  <div className='flex items-center justify-between'>
+                    <div>
+                      <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
+                        Connected Accounts
+                      </p>
+                      <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
+                        {(getPlatformStatus('linkedin') === 'connected' ? 1 : 0) +
+                          (getPlatformStatus('twitter') === 'connected' ? 1 : 0)}
+                      </p>
+                    </div>
+                    <Users className='w-8 h-8 text-indigo-500' />
+                  </div>
+                </div>
+              </Card>
+            </div>
           </div>
 
           {/* Two Column Layout */}
@@ -353,9 +376,7 @@ const Home = () => {
                       Your Automations
                     </Card.Title>
                     <Link to='/automations'>
-                      <Button variant='outline' size='sm'>
-                        View All
-                      </Button>
+
                     </Link>
                   </div>
                 </Card.Header>

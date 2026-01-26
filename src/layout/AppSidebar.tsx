@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router";
 
 // Assume these icons are imported from an icon library
@@ -32,7 +33,7 @@ type NavItem = {
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
@@ -124,11 +125,6 @@ const AppSidebar: React.FC = () => {
       icon: <DollarSign className="w-[24px] h-[24px]" />,
       name: "Pricing",
       path: "/pricing",
-    },
-    {
-      icon: <UserCircleIcon />,
-      name: "User Profile",
-      path: "/profile-settings",
     },
   ];
 
@@ -252,23 +248,112 @@ const AppSidebar: React.FC = () => {
                 )}
               </a>
             ) : (
-              <Link
-                to={nav.path}
-                className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                  }`}
+              <div
+                className={`relative ${(nav.name === "Connections" && Number(user?.onboardingStep) === 1) || (nav.name === "Dashboard" && Number(user?.onboardingStep) === 2) ? "z-50" : ""}`}
               >
-                <span
-                  className={`menu-item-icon-size ${isActive(nav.path)
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
+                {nav.name === "Connections" && Number(user?.onboardingStep) === 1 && createPortal(
+                  <div
+                    className="fixed z-[99999] whitespace-nowrap pointer-events-none animate-fade-in-right"
+                    style={{
+                      left: `calc(${(document.querySelector(`[data-nav-name="Connections"]`)?.getBoundingClientRect().right || 90)}px + 16px)`,
+                      top: `calc(${document.querySelector(`[data-nav-name="Connections"]`)?.getBoundingClientRect().top || 0}px + 23px)`,
+                      transform: 'translateY(-50%)'
+                    }}
+                  >
+                    <div className="bg-brand-500 dark:bg-gray-800 text-white dark:text-gray-200 text-[11.5px] font-bold py-2 px-4 rounded-xl shadow-2xl border border-brand-600/20 dark:border-gray-700 flex items-center relative">
+                      Connect your social media account from here
+                      <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2.5 h-2.5 bg-brand-500 dark:bg-gray-800 border-l border-b border-brand-600/20 dark:border-gray-700 rotate-45"></div>
+                    </div>
+                  </div>,
+                  document.body
+                )}
+
+                {nav.name === "Dashboard" && Number(user?.onboardingStep) === 2 && createPortal(
+                  <div
+                    className="fixed z-[99999] whitespace-nowrap pointer-events-none animate-fade-in-right"
+                    style={{
+                      left: `calc(${(document.querySelector(`[data-nav-name="Dashboard"]`)?.getBoundingClientRect().right || 90)}px + 16px)`,
+                      top: `calc(${document.querySelector(`[data-nav-name="Dashboard"]`)?.getBoundingClientRect().top || 0}px + 23px)`,
+                      transform: 'translateY(-50%)'
+                    }}
+                  >
+                    <div className="bg-brand-500 dark:bg-gray-800 text-white dark:text-gray-200 text-[11.5px] font-bold py-2 px-4 rounded-xl shadow-2xl border border-brand-600/20 dark:border-gray-700 flex items-center relative">
+                      Check your connection status on Dashboard
+                      <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2.5 h-2.5 bg-brand-500 dark:bg-gray-800 border-l border-b border-brand-600/20 dark:border-gray-700 rotate-45"></div>
+                    </div>
+                  </div>,
+                  document.body
+                )}
+
+                {nav.name === "Flows" && Number(user?.onboardingStep) === 4 && createPortal(
+                  <div
+                    className="fixed z-[99999] whitespace-nowrap pointer-events-none animate-fade-in-right"
+                    style={{
+                      left: `calc(${(document.querySelector(`[data-nav-name="Flows"]`)?.getBoundingClientRect().right || 90)}px + 16px)`,
+                      top: `calc(${document.querySelector(`[data-nav-name="Flows"]`)?.getBoundingClientRect().top || 0}px + 23px)`,
+                      transform: 'translateY(-50%)'
+                    }}
+                  >
+                    <div className="bg-brand-500 dark:bg-gray-800 text-white dark:text-gray-200 text-[11.5px] font-bold py-2 px-4 rounded-xl shadow-2xl border border-brand-600/20 dark:border-gray-700 flex items-center relative">
+                      Explore your automation flows
+                      <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2.5 h-2.5 bg-brand-500 dark:bg-gray-800 border-l border-b border-brand-600/20 dark:border-gray-700 rotate-45"></div>
+                    </div>
+                  </div>,
+                  document.body
+                )}
+
+                {nav.name === "Trobs" && Number(user?.onboardingStep) === 5 && createPortal(
+                  <div
+                    className="fixed z-[99999] whitespace-nowrap pointer-events-none animate-fade-in-right"
+                    style={{
+                      left: `calc(${(document.querySelector(`[data-nav-name="Trobs"]`)?.getBoundingClientRect().right || 90)}px + 16px)`,
+                      top: `calc(${document.querySelector(`[data-nav-name="Trobs"]`)?.getBoundingClientRect().top || 0}px + 23px)`,
+                      transform: 'translateY(-50%)'
+                    }}
+                  >
+                    <div className="bg-brand-500 dark:bg-gray-800 text-white dark:text-gray-200 text-[11.5px] font-bold py-2 px-4 rounded-xl shadow-2xl border border-brand-600/20 dark:border-gray-700 flex items-center relative">
+                      Check out your Trobs
+                      <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2.5 h-2.5 bg-brand-500 dark:bg-gray-800 border-l border-b border-brand-600/20 dark:border-gray-700 rotate-45"></div>
+                    </div>
+                  </div>,
+                  document.body
+                )}
+
+                <Link
+                  to={nav.path}
+                  data-nav-name={nav.name}
+                  onClick={() => {
+                    if (nav.name === "Connections" && Number(user?.onboardingStep) === 1) {
+                      useAuthStore.getState().updateOnboarding(2);
+                    }
+                    if (nav.name === "Dashboard" && Number(user?.onboardingStep) === 2) {
+                      useAuthStore.getState().updateOnboarding(3);
+                    }
+                    if (nav.name === "Flows" && Number(user?.onboardingStep) === 4) {
+                      useAuthStore.getState().updateOnboarding(5);
+                    }
+                    if (nav.name === "Trobs" && Number(user?.onboardingStep) === 5) {
+                      useAuthStore.getState().updateOnboarding(6);
+                    }
+                  }}
+                  className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"} ${((nav.name === "Connections" && Number(user?.onboardingStep) === 1) || (nav.name === "Dashboard" && Number(user?.onboardingStep) === 2) || (nav.name === "Flows" && Number(user?.onboardingStep) === 4) || (nav.name === "Trobs" && Number(user?.onboardingStep) === 5))
+                    ? "ring-2 ring-inset ring-brand-500 bg-brand-50/30 dark:bg-brand-500/10 rounded-lg shadow-sm"
+                    : ""
                     }`}
                 >
-                  {nav.icon}
-                </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <span className="menu-item-text">{nav.name}</span>
-                )}
-              </Link>
+                  <span
+                    className={`menu-item-icon-size ${isActive(nav.path)
+                      ? "menu-item-icon-active"
+                      : "menu-item-icon-inactive"
+                      }`}
+                  >
+                    {nav.icon}
+                  </span>
+                  {(isExpanded || isHovered || isMobileOpen) && (
+                    <span className="menu-item-text">{nav.name}</span>
+                  )}
+                </Link>
+              </div>
             )
           ) : (
             <button
@@ -365,14 +450,14 @@ const AppSidebar: React.FC = () => {
                 className="dark:hidden"
                 src="/trobyx.svg"
                 alt="Logo"
-                width={120}
+                width={80}
                 height={40}
               />
               <img
                 className="hidden dark:block"
                 src="/trobyx.svg"
                 alt="Logo"
-                width={120}
+                width={80}
                 height={40}
               />
             </>
@@ -386,10 +471,10 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
-            <div>
+      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar !overflow-x-visible">
+        <nav className="mb-6 !overflow-visible">
+          <div className="flex flex-col gap-4 !overflow-visible">
+            <div className="!overflow-visible">
               <h2
                 className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
                   ? "lg:justify-center"
@@ -404,7 +489,10 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
-            {renderMenuItems(othersItems, "others")}
+            {renderMenuItems(
+              othersItems.filter(item => item.name !== "Sign Out" || isMobileOpen),
+              "others"
+            )}
           </div>
         </nav>
         {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}

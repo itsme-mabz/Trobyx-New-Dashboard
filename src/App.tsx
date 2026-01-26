@@ -30,6 +30,7 @@ import ActiveAutomations from './pages/Automations/ActiveAutomations';
 import CompletedAutomations from './pages/Automations/CompletedAutomations';
 import Platforms from './pages/platforms/Platforms';
 import Pricing from './pages/Pricing/Pricing';
+import NotFound from './pages/OtherPage/NotFound';
 // Since I can't verify all, I will comment out ones I'm unsure of or map them to existing pages if possible. 
 // However, the user explicitly asked for these routes. I will include them and if they fail, the user will see.
 // But valid paths are critical.
@@ -109,9 +110,9 @@ function App() {
           <Route path="/messages" element={<Messages />} />
 
 
-          <Route path="/connections" element={<Platforms/>} />
+          <Route path="/connections" element={<Platforms />} />
 
-          <Route path="/pricing" element={<Pricing/>} />
+          <Route path="/pricing" element={<Pricing />} />
 
 
 
@@ -124,7 +125,7 @@ function App() {
         </Route>
 
         {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
 
       {/* Toast notifications */}

@@ -1,9 +1,9 @@
 input:focus,
 button:focus,
 textarea:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 
@@ -13,7 +13,7 @@ textarea:focus {
   align-items: center;
   overflow: hidden;
   transition: width 0.3s ease;
-  border-radius: 9999px; 
+  border-radius: 9999px;
   background: white;
   padding: 6px 10px;
 }
@@ -32,7 +32,8 @@ textarea:focus {
 }
 
 .header-search-show {
-  width: 180px; /* you can increase */
+  width: 180px;
+  /* you can increase */
   opacity: 1;
 }
 
@@ -42,6 +43,7 @@ textarea:focus {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -98,7 +100,5 @@ textarea:focus {
 }
 
 @media (max-width: 768px) {
-  .chat-container .bg-white {
-    display: none;
-  }
-} 
+  /* Fix for sidebar overlapping if needed, but we'll handle view switching in TSX */
+}

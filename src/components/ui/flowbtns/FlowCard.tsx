@@ -15,6 +15,8 @@ import {
     MessageCircle,
     Eye,
     BarChart3,
+    Trash,
+    CircleSlash,
     LucideIcon
 } from 'lucide-react';
 
@@ -270,12 +272,12 @@ const FlowCard: React.FC<FlowCardProps> = ({ flow, onPause, onResume, onStop, on
                         </button>
                     )}
                     <button
-                        onClick={() => handleAction(onStop, 'stop')}
+                        onClick={() => handleAction(onStop, 'delete')}
                         className="flex items-center gap-1 px-3 py-1.5 bg-red-100 dark:bg-red-900/20 hover:bg-red-200 dark:hover:bg-red-900/30 text-red-800 dark:text-red-400 rounded-md transition-colors"
                         disabled={isLoading}
                     >
-                        <Square className="w-3 h-3" />
-                        Stop
+                        <Trash className="w-3 h-3" />
+                        Delete
                     </button>
                     <button
                         onClick={() => handleAction(onExecute, 'execute')}

@@ -87,27 +87,18 @@ export default function PreferencesOnboardingModal() {
     }
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  if (selectedIndustries.length === 0) {
-    toast.error("Please select at least one industry or skip");
-    return;
-  }
-
-  setIsLoading(true);
-  const token = localStorage.getItem("accessToken");
-
-  try {
+  const savePreferences = async (industriesToSave: string[]) => {
+    const token = localStorage.getItem("accessToken");
     const response = await fetch(`${API_BASE_URL}/api/auth/preferences`, {
-      method: "POST", // changed to POST
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         preferences: {
-          industries: selectedIndustries, // this will be added
+          ...existingPreferences,
+          industries: industriesToSave,
         },
       }),
     });
@@ -117,20 +108,34 @@ const handleSubmit = async (e: React.FormEvent) => {
       throw new Error(data.message || "Failed to update preferences");
     }
 
-    await updateOnboarding(8);
-    toast.success("You are all set!");
-  } catch (error: any) {
-    toast.error(error.message || "Something went wrong");
-  } finally {
-    setIsLoading(false);
-  }
-};
+    setExistingPreferences((prev: any) => ({ ...prev, industries: industriesToSave }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (selectedIndustries.length === 0) {
+      toast.error("Please select at least one industry or skip");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await savePreferences(selectedIndustries);
+      await updateOnboarding(8);
+      toast.success("You are all set!");
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={() => {}} className="max-w-[600px] m-4">
+    <Modal isOpen={isOpen} onClose={() => { }} className="max-w-[600px] m-4">
       <div className="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-10">
         <div className="text-center">
           <div className="flex justify-center mb-6">
@@ -165,6 +170,9 @@ const handleSubmit = async (e: React.FormEvent) => {
               onChange={(selectedOptions) => {
                 const industryValues = selectedOptions.map((option) => option.value);
                 setSelectedIndustries(industryValues);
+                savePreferences(industryValues).catch((err) =>
+                  console.error("Auto-save failed", err)
+                );
               }}
               placeholder="Search job titles like CEO, Founder, Manager..."
             />

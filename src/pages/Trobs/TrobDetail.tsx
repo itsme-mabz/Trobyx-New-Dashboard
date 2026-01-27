@@ -123,6 +123,11 @@ const TrobDetail = () => {
     const [currentStep, setCurrentStep] = useState<'overview' | 'configure' | 'review' | 'results'>('overview');
     const [leads, setLeads] = useState<Lead[]>([]);
     const [isLoadingLeads, setIsLoadingLeads] = useState(false);
+    const [linkedinCookies, setLinkedinCookies] = useState<{ JSESSIONID: string; li_at: string; profile_urn: string }>({
+        JSESSIONID: '',
+        li_at: '',
+        profile_urn: 'urn:li:fsd_profile:ACoAAEpWar4B_9DNsjLkDzGYCy8N5AChqrcrDq0'
+    });
 
     // Check platform connection status
     const {
@@ -143,6 +148,63 @@ const TrobDetail = () => {
             setConfig(selectedTemplate.defaultConfig);
         }
     }, [selectedTemplate]);
+
+    // Fetch LinkedIn cookies on page load for specialized trobs
+    useEffect(() => {
+        if (trobId === 'linkedin-follower-extractor' || trobId === 'linkedin-connections-export') {
+            const fetchCookies = async () => {
+                const token = localStorage.getItem('accessToken');
+                try {
+                    const baseUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+                    const connResponse = await fetch(`${baseUrl}/api/platform-connections`, {
+                        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                    });
+
+                    if (connResponse.ok) {
+                        const connData = await connResponse.json();
+                        const connectionsList = Array.isArray(connData) ? connData : (connData.data || connData.connections || []);
+                        const linkedinConn = connectionsList.find((c: any) =>
+                            (c.platform?.toUpperCase() === 'LINKEDIN') && (c.isActive || c.connected)
+                        );
+
+                        if (linkedinConn && linkedinConn.cookies) {
+                            let cookieData = linkedinConn.cookies;
+                            if (typeof cookieData === 'string') {
+                                try {
+                                    cookieData = JSON.parse(cookieData);
+                                } catch (e) {
+                                    console.error('Failed to parse cookies string', e);
+                                }
+                            }
+
+                            let extractedCookies = {
+                                JSESSIONID: '',
+                                li_at: '',
+                                profile_urn: 'urn:li:fsd_profile:ACoAAEpWar4B_9DNsjLkDzGYCy8N5AChqrcrDq0'
+                            };
+                            if (Array.isArray(cookieData)) {
+                                const jsession = cookieData.find((c: any) => c.name === 'JSESSIONID');
+                                const liAt = cookieData.find((c: any) => c.name === 'li_at');
+                                extractedCookies.JSESSIONID = jsession?.value?.replace(/"/g, '').trim() || '';
+                                extractedCookies.li_at = liAt?.value?.replace(/"/g, '').trim() || '';
+                            } else if (typeof cookieData === 'object' && cookieData !== null) {
+                                extractedCookies.JSESSIONID = (cookieData.JSESSIONID || '').replace(/"/g, '').trim();
+                                extractedCookies.li_at = (cookieData.li_at || '').replace(/"/g, '').trim();
+                            }
+
+                            console.log('✅ PRE-LOADED LinkedIn Cookies for verification:');
+                            console.log('JSESSIONID:', extractedCookies.JSESSIONID);
+                            console.log('li_at:', extractedCookies.li_at);
+                            setLinkedinCookies(extractedCookies);
+                        }
+                    }
+                } catch (err) {
+                    console.error('Failed to pre-load LinkedIn cookies:', err);
+                }
+            };
+            fetchCookies();
+        }
+    }, [trobId]);
 
     const handleConfigChange = (path: string, value: any) => {
         setConfig(prev => {
@@ -208,38 +270,119 @@ const TrobDetail = () => {
         setIsStarting(true);
         try {
             const token = localStorage.getItem('accessToken');
-            if (!token) {
+
+            // For the specialized endpoint, we might not need the main backend's token
+            // but we definitely need it for the standard backend.
+            if (!token && trobId !== 'linkedin-follower-extractor' && trobId !== 'linkedin-connections-export') {
                 toast.error('Please log in to start automation');
                 navigate('/login');
                 return;
             }
 
-            const response = await fetch('http://192.168.1.56:3000/api/jobs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
+            let url = `${import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000'}/api/jobs`;
+            let requestBody: any;
+            let headers: Record<string, string> = {
+                'Content-Type': 'application/json',
+            };
+
+            // Specialized endpoint for LinkedIn Follower Extractor & Connections Export
+            if (trobId === 'linkedin-follower-extractor' || trobId === 'linkedin-connections-export') {
+                url = trobId === 'linkedin-connections-export'
+                    ? 'http://192.168.1.23:5000/api/connections'
+                    : 'http://192.168.1.23:5000/api/followers';
+
+                if (!linkedinCookies.li_at || !linkedinCookies.JSESSIONID) {
+                    toast.error('LinkedIn session not found. Please connect your LinkedIn account.');
+                    setIsStarting(false);
+                    return;
+                }
+
+                // EXACT structure requested by user, using 2-space indentation just in case the backend is picky
+                const payload = {
+                    "cookies": {
+                        "JSESSIONID": linkedinCookies.JSESSIONID,
+                        "li_at": linkedinCookies.li_at
+                    },
+                    "count": Number(config.count || 10),
+                    "headers": {},
+                    "start": Number(config.start || 0)
+                };
+
+                requestBody = payload;
+                console.log('🚀 SENDING PAYLOAD:', JSON.stringify(payload, null, 2));
+            } else {
+                requestBody = {
                     templateId: selectedTemplate.id,
                     name: selectedTemplate.displayName,
                     config,
                     priority: 'normal',
-                }),
+                };
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+            }
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(requestBody, null, ((trobId === 'linkedin-follower-extractor' || trobId === 'linkedin-connections-export') ? 2 : 0)),
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to start automation');
+                let errorMsg = 'Failed to start automation';
+                try {
+                    const errorData = await response.json();
+                    errorMsg = errorData.message || errorData.error || errorMsg;
+                } catch (e) {
+                    errorMsg = `Server error: ${response.status}`;
+                }
+                throw new Error(errorMsg);
             }
 
             const result = await response.json();
 
-            toast.success(`${result.message}! Automation started successfully.`);
+            toast.success(`${result.message || 'Automation started'}!`);
+
+            // If the specialized endpoint returns leads directly, set them
+            // If the specialized endpoint returns leads directly, set them
+            if ((trobId === 'linkedin-follower-extractor' || trobId === 'linkedin-connections-export') && result.data) {
+                let itemsData = [];
+                if (trobId === 'linkedin-connections-export') {
+                    // Assuming similar structure for connections
+                    itemsData = result.data.connections || (result.data.data && result.data.data.connections) || (Array.isArray(result.data) ? result.data : []);
+                } else {
+                    itemsData = result.data.followers || (result.data.data && result.data.data.followers) || (Array.isArray(result.data) ? result.data : []);
+                }
+
+                if (Array.isArray(itemsData) && itemsData.length > 0) {
+                    // Map items to Lead format
+                    const mappedLeads: Lead[] = itemsData.map((f: any, idx: number) => ({
+                        id: f.profile_id || f.member_urn || f.id || `item-${idx}`,
+                        name: f.full_name || `${f.first_name || ''} ${f.last_name || ''}`.trim() || 'LinkedIn Member',
+                        title: f.headline || f.title || 'N/A',
+                        company: f.company_name || f.company || '',
+                        location: f.location || 'N/A',
+                        profileImage: f.profile_picture?.medium_url || f.image_url || f.profile_image || '',
+                        follower_count: Number(f.follower_count ?? f.followers ?? 0),
+                        mutual_connection_count: Number(f.mutual_connection_count ?? 0),
+                        is_following_back: Boolean(f.is_following_back ?? f.follows_you ?? false),
+                        profile_url: f.profile_url || (f.public_identifier ? `https://www.linkedin.com/in/${f.public_identifier}` : '#'),
+                        foundAt: new Date().toISOString(),
+                    }));
+
+                    setLeads(mappedLeads);
+                } else if (Array.isArray(result.data)) {
+                    setLeads(result.data);
+                }
+            }
 
             // Instead of navigating away, show the results step
             setCurrentStep('results');
-            fetchLeads();
+
+            // Only fetch from main backend if it's not the specialized one or if no data returned
+            if ((trobId !== 'linkedin-follower-extractor' && trobId !== 'linkedin-connections-export') || (!result.data)) {
+                fetchLeads();
+            }
             // navigate('/automations');
         } catch (error: any) {
             console.error('Failed to start automation:', error);
@@ -253,9 +396,11 @@ const TrobDetail = () => {
         setIsLoadingLeads(true);
         try {
             const token = localStorage.getItem('accessToken');
-            // Try to fetch real leads from the new endpoint structure if available
-            // For now, we'll try the generic results endpoint
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000'}/api/jobs/${selectedTemplate?.id}/results`, {
+
+            // For specialized endpoint, we might not have a "results" endpoint on the main backend
+            // but we can try the main backend first as a fallback
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+            const response = await fetch(`${baseUrl}/api/jobs/${selectedTemplate?.id}/results`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },

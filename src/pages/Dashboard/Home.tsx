@@ -293,80 +293,79 @@ const Home = () => {
             {/* Left Column - Main Content */}
             <div className='xl:col-span-2 space-y-8'>
               {/* Quick Start / Onboarding */}
-              {isNewUser && (
-                <Card className='bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-50 border border-blue-200 dark:from-blue-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 dark:border-blue-800'>
-                  <div className='p-8'>
-                    <div className='flex items-start gap-4'>
-                      <div className='w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0'>
-                        <Target className='w-6 h-6 text-white' />
-                      </div>
-                      <div className='flex-1'>
-                        <h3 className='text-xl font-bold text-black mb-3 dark:text-white'>
-                          Get Started in 3 Steps
-                        </h3>
-                        <div className='space-y-4'>
-                          <div className='flex items-center gap-4'>
-                            <div
-                              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${hasConnectedPlatforms
-                                ? 'bg-green-500 text-white'
-                                : 'bg-blue-500 text-white'
-                                }`}
-                            >
-                              {hasConnectedPlatforms ? '✓' : '1'}
-                            </div>
-                            <div className='flex-1'>
-                              <h4 className='font-semibold text-black dark:text-white'>
-                                Connect Your Platform
-                              </h4>
-                              <p className='text-gray-600 text-sm dark:text-gray-400'>
-                                Link your LinkedIn or Twitter account
-                              </p>
-                            </div>
-                            {!hasConnectedPlatforms && (
-                              <Link to='/platforms'>
-                                <Button size='sm'>Connect</Button>
-                              </Link>
-                            )}
+              {/* Quick Start / Onboarding */}
+              <Card className='bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-50 border border-blue-200 dark:from-blue-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 dark:border-blue-800'>
+                <div className='p-8'>
+                  <div className='flex items-start gap-4'>
+                    <div className='w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0'>
+                      <Target className='w-6 h-6 text-white' />
+                    </div>
+                    <div className='flex-1'>
+                      <h3 className='text-xl font-bold text-black mb-3 dark:text-white'>
+                        Get Started in 3 Steps
+                      </h3>
+                      <div className='space-y-4'>
+                        <div className='flex items-center gap-4'>
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${hasConnectedPlatforms
+                              ? 'bg-green-500 text-white'
+                              : 'bg-blue-500 text-white'
+                              }`}
+                          >
+                            {hasConnectedPlatforms ? '✓' : '1'}
                           </div>
-
-                          <div className='flex items-center gap-4'>
-                            <div className='w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-bold dark:bg-gray-700 dark:text-gray-300'>
-                              2
-                            </div>
-                            <div className='flex-1'>
-                              <h4 className='font-semibold text-black dark:text-white'>
-                                Choose Template
-                              </h4>
-                              <p className='text-gray-600 text-sm dark:text-gray-400'>
-                                Pick from {templates.length} automation templates
-                              </p>
-                            </div>
-                            <Link to='/trobs'>
-                              <Button size='sm' variant='outline'>
-                                Browse
-                              </Button>
+                          <div className='flex-1'>
+                            <h4 className='font-semibold text-black dark:text-white'>
+                              Connect Your Platform
+                            </h4>
+                            <p className='text-gray-600 text-sm dark:text-gray-400'>
+                              Link your LinkedIn or Twitter account
+                            </p>
+                          </div>
+                          {!hasConnectedPlatforms && (
+                            <Link to='/platforms'>
+                              <Button size='sm'>Connect</Button>
                             </Link>
-                          </div>
+                          )}
+                        </div>
 
-                          <div className='flex items-center gap-4'>
-                            <div className='w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-bold dark:bg-gray-700 dark:text-gray-300'>
-                              3
-                            </div>
-                            <div className='flex-1'>
-                              <h4 className='font-semibold text-black dark:text-white'>
-                                Start Automating
-                              </h4>
-                              <p className='text-gray-600 text-sm dark:text-gray-400'>
-                                Configure and launch your first automation
-                              </p>
-                            </div>
+                        <div className='flex items-center gap-4'>
+                          <div className='w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-bold dark:bg-gray-700 dark:text-gray-300'>
+                            2
+                          </div>
+                          <div className='flex-1'>
+                            <h4 className='font-semibold text-black dark:text-white'>
+                              Choose Template
+                            </h4>
+                            <p className='text-gray-600 text-sm dark:text-gray-400'>
+                              Pick from {templates.length} automation templates
+                            </p>
+                          </div>
+                          <Link to='/trobs'>
+                            <Button size='sm' variant='outline'>
+                              Browse
+                            </Button>
+                          </Link>
+                        </div>
+
+                        <div className='flex items-center gap-4'>
+                          <div className='w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-sm font-bold dark:bg-gray-700 dark:text-gray-300'>
+                            3
+                          </div>
+                          <div className='flex-1'>
+                            <h4 className='font-semibold text-black dark:text-white'>
+                              Start Automating
+                            </h4>
+                            <p className='text-gray-600 text-sm dark:text-gray-400'>
+                              Configure and launch your first automation
+                            </p>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </Card>
-              )}
+                </div>
+              </Card>
 
               {/* Automations Overview */}
               <Card>

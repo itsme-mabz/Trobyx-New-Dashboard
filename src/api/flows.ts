@@ -1,8 +1,6 @@
 import {
   apiGet,
   apiPost,
-  apiPut,
-  apiDelete,
   type ApiResponse
 } from './apiUtils';
 
@@ -166,16 +164,34 @@ export const startFlow = async (
  * @param {GetUserFlowsParams} params - Query parameters
  * @returns {Promise<ApiResponse<UserFlowsResponse>>} User flows response
  */
-export const getUserFlows = (
+export const getUserFlows = async (
   params: GetUserFlowsParams = {}
 ): Promise<ApiResponse<UserFlowsResponse>> => {
+  const token = localStorage.getItem('accessToken');
   const queryParams = new URLSearchParams();
 
   if (params.status) queryParams.append('status', params.status);
   if (params.templateId) queryParams.append('templateId', params.templateId);
 
   const queryString = queryParams.toString();
-  return apiGet<UserFlowsResponse>(`/flows${queryString ? `?${queryString}` : ''}`);
+  // Use specific endpoint for fetching flows
+  const url = `http://192.168.1.56:3000/api/flows${queryString ? `?${queryString}` : ''}`;
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to fetch flows');
+  }
+
+  return data;
 };
 
 /**
@@ -192,8 +208,25 @@ export const getFlow = (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>
  * @param {string} flowId - Flow instance ID
  * @returns {Promise<ApiResponse<{ flow: UserFlow }>>} Pause response
  */
-export const pauseFlow = (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>> => {
-  return apiPut<{ flow: UserFlow }>(`/flows/${flowId}/pause`);
+export const pauseFlow = async (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>> => {
+  const token = localStorage.getItem('accessToken');
+  const url = `http://192.168.1.56:3000/api/flows/${flowId}/pause`;
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to pause flow');
+  }
+
+  return data;
 };
 
 /**
@@ -201,8 +234,25 @@ export const pauseFlow = (flowId: string): Promise<ApiResponse<{ flow: UserFlow 
  * @param {string} flowId - Flow instance ID
  * @returns {Promise<ApiResponse<{ flow: UserFlow }>>} Resume response
  */
-export const resumeFlow = (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>> => {
-  return apiPut<{ flow: UserFlow }>(`/flows/${flowId}/resume`);
+export const resumeFlow = async (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>> => {
+  const token = localStorage.getItem('accessToken');
+  const url = `http://192.168.1.56:3000/api/flows/${flowId}/resume`;
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to resume flow');
+  }
+
+  return data;
 };
 
 /**
@@ -210,8 +260,31 @@ export const resumeFlow = (flowId: string): Promise<ApiResponse<{ flow: UserFlow
  * @param {string} flowId - Flow instance ID
  * @returns {Promise<ApiResponse>} Delete response
  */
-export const deleteFlow = (flowId: string): Promise<ApiResponse> => {
-  return apiDelete(`/flows/${flowId}`);
+export const deleteFlow = async (flowId: string): Promise<ApiResponse> => {
+  const token = localStorage.getItem('accessToken');
+  // Use specific endpoint for flow deletion
+  const url = `http://192.168.1.56:3000/api/flows/${flowId}`;
+
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  // Handle 204 No Content if applicable, or parse JSON
+  if (response.status === 204) {
+    return { status: 'success', data: null, message: 'Flow deleted successfully' };
+  }
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Failed to delete flow');
+  }
+
+  return data;
 };
 
 /**

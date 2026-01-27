@@ -155,10 +155,11 @@ const Flows: React.FC = () => {
 
     const fetchUserFlows = async (): Promise<void> => {
         try {
-            const params: Record<string, string> = {};
-            if (statusFilter !== 'all') {
-                params.status = statusFilter.toUpperCase();
-            }
+            // Updated to fetch only specific active flows for the running tab as requested
+            const params: Record<string, string> = {
+                status: 'ACTIVE',
+                templateId: 'linkedin-outreach-flow'
+            };
 
             const response = await getUserFlows(params) as ApiResponse<FlowsResponse>;
             if (response.status === 'success') {
@@ -167,7 +168,7 @@ const Flows: React.FC = () => {
         } catch (error) {
             console.error('Failed to fetch user flows:', error);
             toast.error('Failed to load your flows');
-            throw error;
+            // Don't throw to prevent unhandled rejection crashing the app, just log
         }
     };
 

@@ -57,6 +57,13 @@ export interface UserFlow {
   successCount: number;
   failureCount: number;
   config: Record<string, any>;
+  state?: {
+    prospectTracking?: {
+      totalEngagements?: number;
+      totalProspectsFound?: number;
+      connectionsAccepted?: number;
+    };
+  };
 }
 
 export interface UserFlowsResponse {

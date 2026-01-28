@@ -950,8 +950,8 @@ function Messages() {
                                         loading='lazy'
                                     />
                                 </div>
-                                <div className='flex flex-col'>
-                                    <span className='font-medium dark:text-white'>{selectedContact.name}</span>
+                                <div className='flex flex-col min-w-0'>
+                                    <span className='font-medium dark:text-white truncate'>{selectedContact.name}</span>
                                     {selectedContact.headline && (
                                         <span className='text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]'>
                                             {selectedContact.headline}
@@ -976,30 +976,31 @@ function Messages() {
                     <div className='flex items-center gap-4'>
                         {selectedContact?.conversation_url && (
                             <a
-                                href={selectedContact.conversation_url}
+                                href={selectedContact?.conversation_url}
                                 target='_blank'
                                 rel='noopener noreferrer'
-                                className='bg-[#0a66c2] text-white font-semibold px-4 py-2 rounded-md flex items-center space-x-2 transition-colors hover:bg-[#004182] focus:outline-none focus:ring-2 focus:ring-blue-400'
+                                className='bg-[#0a66c2] text-white font-semibold p-1.5 sm:px-3 sm:py-1.5 rounded-lg flex items-center gap-1.5 transition-colors hover:bg-[#004182] focus:outline-none transition-all flex-shrink-0'
+                                title="View on LinkedIn"
                             >
                                 <Linkedin className='w-4 h-4' />
-                                <span>View on LinkedIn</span>
+                                <span className='hidden sm:inline text-xs'>View Profile</span>
                             </a>
                         )}
                         {/* Search animation container */}
                         <div
                             className={`header-search-container 
-                ${showHeaderSearch ? 'header-search-show' : 'header-search-hide'} dark:bg-gray-700`}
+                            ${showHeaderSearch ? 'header-search-show' : 'header-search-hide'} dark:bg-gray-700`}
                         >
                             <input
                                 type='text'
-                                className='header-search-input outline-none focus:outline-none dark:text-white focus:ring-0 focus:border-none focus:shadow-none'
+                                className='header-search-input outline-none focus:outline-none dark:text-white focus:ring-0'
                                 value={headerSearchText}
                                 onChange={e => setHeaderSearchText(e.target.value)}
-                                placeholder='Search in messages...'
+                                placeholder='Search...'
                             />
                             {showHeaderSearch && (
                                 <X
-                                    className='w-8 h-4 text-gray-500 dark:text-gray-400 cursor-pointer'
+                                    className='w-5 h-5 text-gray-500 dark:text-gray-400 cursor-pointer flex-shrink-0'
                                     onClick={() => {
                                         setShowHeaderSearch(false);
                                         setHeaderSearchText('');
@@ -1008,10 +1009,12 @@ function Messages() {
                             )}
                         </div>
                         {/* The search icon */}
-                        <Search
-                            className='w-6 h-6 text-gray-600 dark:text-gray-400 cursor-pointer'
-                            onClick={() => setShowHeaderSearch(true)}
-                        />
+                        {!showHeaderSearch && (
+                            <Search
+                                className='w-6 h-6 text-gray-600 dark:text-gray-400 cursor-pointer flex-shrink-0'
+                                onClick={() => setShowHeaderSearch(true)}
+                            />
+                        )}
                     </div>
                 </div>
                 {/* Main chat area */}
@@ -1047,7 +1050,7 @@ function Messages() {
                                 </div>
                             </div>
                         ) : messages.length > 0 ? (
-                            <div className='flex flex-col gap-4 flex-1 pb-20'>
+                            <div className='flex flex-col gap-4 flex-1 pb-6'>
                                 {messages.map((message, index) => {
                                     // Date separator logic - check for valid timestamp
                                     const timestamp = message.timestamp || 0;
@@ -1156,7 +1159,7 @@ function Messages() {
                     </div>
                     {/* Message input */}
                     {selectedContact && (
-                        <div className='sticky bottom-0 left-0 right-0 p-4 z-10 bg-transparent'>
+                        <div className='sticky bottom-0 left-0 right-0 px-4 py-2 z-10 bg-transparent'>
                             <div className='flex items-center gap-3 bg-white dark:bg-[#2a3942] rounded-full px-4 py-1 shadow-[0_1px_3px_rgba(0,0,0,0.1)]'>
                                 <div className='flex-1'>
                                     <textarea
@@ -1185,14 +1188,14 @@ function Messages() {
                                     )}
                                 </button>
                             </div>
-                            <div className='text-xs text-gray-500 mt-2 text-center'>
+                            <div className='text-[10px] text-gray-500 mt-1 text-center'>
                                 Messages are sent via LinkedIn
                             </div>
                         </div>
                     )}
                 </div>
             </div>
-        </section>
+        </section >
     );
 }
 

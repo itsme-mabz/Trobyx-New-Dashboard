@@ -254,26 +254,26 @@ const FlowProspects: React.FC = () => {
     };
 
     const getMatchQualityColor = (quality?: string) => {
-        if (!quality) return 'text-gray-600 bg-gray-100 border-gray-200';
+        if (!quality) return 'text-gray-500 bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600';
 
         switch (quality.toLowerCase()) {
             case 'hot':
-                return 'text-red-600 bg-red-100 border-red-200';
+                return 'text-red-600 bg-red-50 dark:bg-red-900/30 border-red-100 dark:border-red-800/50';
             case 'warm':
-                return 'text-orange-600 bg-orange-100 border-orange-200';
+                return 'text-orange-600 bg-orange-50 dark:bg-orange-900/30 border-orange-100 dark:border-orange-800/50';
             case 'cold':
-                return 'text-blue-600 bg-blue-100 border-blue-200';
+                return 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800/50';
             default:
-                return 'text-gray-600 bg-gray-100 border-gray-200';
+                return 'text-gray-600 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
         }
     };
 
     const getAIScoreColor = (score?: number) => {
-        if (score === undefined) return 'text-gray-600';
-        if (score >= 90) return 'text-green-600';
-        if (score >= 70) return 'text-blue-600';
-        if (score >= 50) return 'text-yellow-600';
-        return 'text-red-600';
+        if (score === undefined) return 'text-gray-500 border-gray-200 dark:border-gray-700';
+        if (score >= 90) return 'text-green-600 bg-green-50 dark:bg-green-900/30 border-green-100 dark:border-green-800/50';
+        if (score >= 70) return 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 border-blue-100 dark:border-blue-800/50';
+        if (score >= 50) return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30 border-yellow-100 dark:border-yellow-800/50';
+        return 'text-red-600 bg-red-50 dark:bg-red-900/30 border-red-100 dark:border-red-800/50';
     };
 
     const formatDate = (dateString?: string) => {
@@ -285,7 +285,7 @@ const FlowProspects: React.FC = () => {
     const renderActivitiesTimeline = (activities?: Record<string, Activity[]>) => {
         if (!activities || Object.keys(activities).length === 0) {
             return (
-                <div className="text-center py-4 text-gray-500">
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                     No activities recorded
                 </div>
             );
@@ -293,14 +293,14 @@ const FlowProspects: React.FC = () => {
 
         return Object.entries(activities).map(([activityType, activityList]) => (
             <div key={activityType} className="mb-3">
-                <h4 className="font-medium text-gray-900 mb-2 capitalize">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-2 capitalize">
                     {activityType.replace(/_/g, ' ').toLowerCase()}
                 </h4>
                 <div className="space-y-2">
                     {activityList.map((activity: Activity, index: number) => (
-                        <div key={index} className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded">
-                            <span className="text-gray-700">{activity.message || activity.description}</span>
-                            <span className="text-gray-500 text-xs">{formatDate(activity.timestamp)}</span>
+                        <div key={index} className="flex items-center justify-between text-sm p-2 bg-gray-50 dark:bg-gray-900/50 rounded border border-gray-100 dark:border-gray-800">
+                            <span className="text-gray-700 dark:text-gray-300">{activity.message || activity.description}</span>
+                            <span className="text-gray-500 dark:text-gray-500 text-xs">{formatDate(activity.timestamp)}</span>
                         </div>
                     ))}
                 </div>
@@ -311,7 +311,7 @@ const FlowProspects: React.FC = () => {
     const renderEngagements = (engagements?: Engagement[]) => {
         if (!engagements || engagements.length === 0) {
             return (
-                <div className="text-center py-4 text-gray-500">
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                     No engagements recorded
                 </div>
             );
@@ -320,31 +320,31 @@ const FlowProspects: React.FC = () => {
         return (
             <div className="space-y-3">
                 {engagements.map((engagement: Engagement, index: number) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-3">
+                    <div key={index} className="bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-purple-500/20 rounded-lg p-3 shadow-sm hover:border-purple-300 dark:hover:border-purple-500/40 transition-colors">
                         <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
                                 {engagement.type === 'POST_LIKED' ? (
-                                    <Heart className="w-4 h-4 text-red-500" />
+                                    <Heart className="w-4 h-4 text-pink-500" />
                                 ) : (
-                                    <MessageSquare className="w-4 h-4 text-blue-500" />
+                                    <MessageSquare className="w-4 h-4 text-purple-500" />
                                 )}
-                                <span className="font-medium text-gray-900">
+                                <span className="font-medium text-gray-900 dark:text-white">
                                     {engagement.type === 'POST_LIKED' ? 'Liked Post' : 'Commented on Post'}
                                 </span>
                             </div>
-                            <span className="text-xs text-gray-500">{formatDate(engagement.timestamp)}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-500">{formatDate(engagement.timestamp)}</span>
                         </div>
 
                         {engagement.postText && (
-                            <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-2 line-clamp-2 italic border-l-2 border-gray-200 dark:border-gray-700 pl-2">
                                 "{engagement.postText}"
                             </p>
                         )}
 
                         {engagement.comment && (
-                            <p className="text-sm text-gray-600 bg-blue-50 p-2 rounded">
-                                <span className="font-medium">Comment:</span> "{engagement.comment}"
-                            </p>
+                            <div className="text-sm text-gray-600 dark:text-gray-400 bg-blue-50/50 dark:bg-blue-500/5 p-2 rounded border border-blue-100/50 dark:border-blue-500/10 mb-2">
+                                <span className="font-medium text-blue-700 dark:text-blue-400">Your Comment:</span> "{engagement.comment}"
+                            </div>
                         )}
 
                         {engagement.postUrl && (
@@ -352,7 +352,7 @@ const FlowProspects: React.FC = () => {
                                 href={engagement.postUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-sm"
+                                className="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 text-sm font-medium"
                             >
                                 View Post <ExternalLink className="w-3 h-3" />
                             </a>
@@ -365,7 +365,7 @@ const FlowProspects: React.FC = () => {
 
     if (loading && prospects.length === 0) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex items-center justify-center min-h-[400px] bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
             </div>
         );
@@ -373,10 +373,10 @@ const FlowProspects: React.FC = () => {
 
     if (!flow) {
         return (
-            <div className="text-center py-12">
+            <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
                 <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Flow not found</h3>
-                <p className="text-gray-600 mb-4">The requested flow could not be found.</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Flow not found</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">The requested flow could not be found.</p>
                 <Link to="/flows">
                     <Flowbtn>Back to Flows</Flowbtn>
                 </Link>
@@ -385,9 +385,9 @@ const FlowProspects: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pt-2 px-4 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b border-gray-200 dark:border-gray-800 pb-6">
                 <div className="flex items-center gap-4">
                     <Link to={`/flows/${flowId}/analytics`}>
                         <Flowbtn variant="outline" size="sm" className="flex items-center gap-2">
@@ -396,12 +396,12 @@ const FlowProspects: React.FC = () => {
                         </Flowbtn>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
-                            <Users className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-purple-500/10 dark:bg-purple-500/20 rounded-xl flex items-center justify-center border border-purple-500/20">
+                            <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-black">Flow Prospects</h1>
-                            <p className="text-gray-600 text-sm">{flow.name}</p>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Flow Prospects</h1>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{flow.name}</p>
                         </div>
                     </div>
                 </div>
@@ -421,51 +421,53 @@ const FlowProspects: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div className="flex flex-col md:flex-row gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 transition-colors">
+                <div className="flex flex-col lg:flex-row gap-4">
                     <div className="flex-1">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
-                                placeholder="Search prospects by name, company, or title..."
+                                placeholder="Search prospects..."
                                 value={filters.search}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     setFilters({ ...filters, search: e.target.value })
                                 }
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                             />
                         </div>
                     </div>
 
-                    <div className="w-full md:w-48">
-                        <select
-                            value={filters.status}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                                setFilters({ ...filters, status: e.target.value })
-                            }
-                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="">All Status</option>
-                            <option value="CONTACTED">Contacted</option>
-                            <option value="ACCEPTED">Connected</option>
-                            <option value="PENDING">Connection Pending</option>
-                            <option value="DECLINED">Connection Declined</option>
-                        </select>
-                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex gap-4">
+                        <div className="w-full lg:w-48">
+                            <select
+                                value={filters.status}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                                    setFilters({ ...filters, status: e.target.value })
+                                }
+                                className="w-full px-3 py-2 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            >
+                                <option value="">All Status</option>
+                                <option value="CONTACTED">Contacted</option>
+                                <option value="ACCEPTED">Connected</option>
+                                <option value="PENDING">Connection Pending</option>
+                                <option value="DECLINED">Connection Declined</option>
+                            </select>
+                        </div>
 
-                    <div className="w-full md:w-48">
-                        <select
-                            value={filters.aiScore || ''}
-                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                                setFilters({ ...filters, aiScore: e.target.value })
-                            }
-                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                            <option value="">All AI Scores</option>
-                            <option value="qualified">Qualified ({'>'} 50)</option>
-                            <option value="unqualified">Unqualified ({'<='} 50)</option>
-                        </select>
+                        <div className="w-full lg:w-48">
+                            <select
+                                value={filters.aiScore || ''}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                                    setFilters({ ...filters, aiScore: e.target.value })
+                                }
+                                className="w-full px-3 py-2 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+                            >
+                                <option value="">All AI Scores</option>
+                                <option value="qualified">Qualified ({'>'} 50)</option>
+                                <option value="unqualified">Unqualified ({'<='} 50)</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className="flex gap-2">
@@ -473,7 +475,7 @@ const FlowProspects: React.FC = () => {
                             onClick={toggleTopPicks}
                             size="sm"
                             variant={filters.aiScore === 'top_picks' ? 'primary' : 'outline'}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-2 whitespace-nowrap"
                         >
                             <Sparkles className="w-4 h-4" />
                             Top Prospects
@@ -492,23 +494,23 @@ const FlowProspects: React.FC = () => {
             {/* Results Summary */}
             {pagination && (
                 <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                         Showing {Math.min((filters.page - 1) * filters.limit + 1, pagination.totalItems)}-
                         {Math.min(filters.page * filters.limit, pagination.totalItems)} of {pagination.totalItems} prospects
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                         Page {pagination.currentPage} of {pagination.totalPages}
                     </div>
                 </div>
             )}
 
             {/* Prospects List */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-colors">
                 {prospects.length === 0 ? (
                     <div className="text-center py-12">
-                        <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No prospects found</h3>
-                        <p className="text-gray-600">
+                        <Users className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No prospects found</h3>
+                        <p className="text-gray-600 dark:text-gray-400">
                             {filters.search || filters.status
                                 ? 'No prospects match your current filters.'
                                 : 'No prospects have been found for this flow yet.'
@@ -516,20 +518,20 @@ const FlowProspects: React.FC = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-200">
+                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
                         {prospects.map((prospect: Prospect) => (
-                            <div key={prospect.id} className="p-4 hover:bg-gray-50 transition-colors">
-                                <div className="flex items-start gap-3">
+                            <div key={prospect.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
+                                <div className="flex items-start gap-4">
                                     {/* Avatar */}
                                     <div className="flex-shrink-0">
                                         {prospect.profileImage ? (
                                             <img
                                                 src={prospect.profileImage}
                                                 alt={prospect.name || 'Prospect'}
-                                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                                                className="w-12 h-12 rounded-full object-cover border-2 border-gray-100 dark:border-gray-700 shadow-sm"
                                             />
                                         ) : (
-                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium shadow-sm">
                                                 {prospect.name?.charAt(0) || '?'}
                                             </div>
                                         )}
@@ -538,24 +540,24 @@ const FlowProspects: React.FC = () => {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between">
                                             <div className="min-w-0">
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <h3 className="font-semibold text-gray-900 truncate">
+                                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white truncate">
                                                         {prospect.name || 'Unknown Prospect'}
                                                     </h3>
                                                     {prospect.aiScore !== undefined && (
-                                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getAIScoreColor(prospect.aiScore)}`}>
+                                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border shadow-sm ${getAIScoreColor(prospect.aiScore)}`}>
                                                             <Star className="w-3 h-3 fill-current" />
                                                             {prospect.aiScore}/100
                                                         </span>
                                                     )}
                                                     {prospect.matchQuality && (
-                                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getMatchQualityColor(prospect.matchQuality)}`}>
+                                                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border shadow-sm ${getMatchQualityColor(prospect.matchQuality)}`}>
                                                             {prospect.matchQuality}
                                                         </span>
                                                     )}
                                                 </div>
 
-                                                <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-2">
+                                                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
                                                     {prospect.title && (
                                                         <div className="flex items-center gap-1">
                                                             <Award className="w-3 h-3" />
@@ -576,7 +578,7 @@ const FlowProspects: React.FC = () => {
                                                     )}
                                                 </div>
 
-                                                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                                                <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
                                                     {prospect.connection?.sentAt && (
                                                         <div className="flex items-center gap-1">
                                                             <UserPlus className="w-3 h-3" />
@@ -600,7 +602,7 @@ const FlowProspects: React.FC = () => {
 
                                             <button
                                                 onClick={() => toggleProspectExpansion(prospect.id)}
-                                                className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                                                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                             >
                                                 {expandedProspect === prospect.id ? (
                                                     <ChevronDown className="w-4 h-4" />
@@ -612,31 +614,31 @@ const FlowProspects: React.FC = () => {
 
                                         {/* Expanded Details */}
                                         {expandedProspect === prospect.id && (
-                                            <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+                                            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-4">
                                                 {/* Connection Details */}
                                                 {prospect.connection && (
-                                                    <div className="bg-blue-50 rounded-lg p-4">
-                                                        <h4 className="font-medium text-blue-900 mb-3 flex items-center gap-2">
+                                                    <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-4 border border-blue-100 dark:border-blue-500/20 shadow-sm">
+                                                        <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
                                                             <UserCheck className="w-4 h-4" />
                                                             Connection Details
                                                         </h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             <div>
-                                                                <p className="text-sm text-blue-800"><strong>Sent:</strong> {formatDate(prospect.connection.sentAt)}</p>
-                                                                <p className="text-sm text-blue-800 mt-1"><strong>Message:</strong></p>
-                                                                <p className="text-sm text-blue-800 bg-white p-2 rounded mt-1 whitespace-pre-wrap">
+                                                                <p className="text-sm text-blue-800 dark:text-blue-200"><strong>Sent:</strong> {formatDate(prospect.connection.sentAt)}</p>
+                                                                <p className="text-sm text-blue-800 dark:text-blue-300/70 mt-2"><strong>Message:</strong></p>
+                                                                <p className="text-sm text-blue-800 dark:text-blue-200 bg-white/50 dark:bg-gray-900/50 p-3 rounded-lg border border-blue-100/50 dark:border-blue-500/10 mt-1 whitespace-pre-wrap">
                                                                     {prospect.connection.message}
                                                                 </p>
                                                             </div>
-                                                            <div className="space-y-2">
+                                                            <div className="space-y-3">
                                                                 {prospect.connection.acceptedAt && (
-                                                                    <div className="flex items-center gap-2 text-green-700">
+                                                                    <div className="flex items-center gap-2 text-green-700 dark:text-green-400 font-medium">
                                                                         <UserCheck className="w-4 h-4" />
                                                                         <span>Connection Accepted: {formatDate(prospect.connection.acceptedAt)}</span>
                                                                     </div>
                                                                 )}
                                                                 {prospect.connection.declinedAt && (
-                                                                    <div className="flex items-center gap-2 text-red-700">
+                                                                    <div className="flex items-center gap-2 text-red-700 dark:text-red-400 font-medium">
                                                                         <UserX className="w-4 h-4" />
                                                                         <span>Connection Declined: {formatDate(prospect.connection.declinedAt)}</span>
                                                                     </div>
@@ -648,8 +650,8 @@ const FlowProspects: React.FC = () => {
 
                                                 {/* Engagements */}
                                                 {prospect.engagements && prospect.engagements.length > 0 && (
-                                                    <div className="bg-purple-50 rounded-lg p-4">
-                                                        <h4 className="font-medium text-purple-900 mb-3 flex items-center gap-2">
+                                                    <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-4 border border-purple-100 dark:border-purple-500/20 shadow-sm">
+                                                        <h4 className="font-medium text-purple-900 dark:text-purple-300 mb-3 flex items-center gap-2">
                                                             <Heart className="w-4 h-4" />
                                                             Engagement Activities ({prospect.engagements.length})
                                                         </h4>
@@ -659,32 +661,32 @@ const FlowProspects: React.FC = () => {
 
                                                 {/* Recent Posts */}
                                                 {prospect.recentPosts && prospect.recentPosts.length > 0 && (
-                                                    <div className="bg-green-50 rounded-lg p-4">
-                                                        <h4 className="font-medium text-green-900 mb-3 flex items-center gap-2">
+                                                    <div className="bg-green-50 dark:bg-green-500/10 rounded-lg p-4 border border-green-100 dark:border-green-500/20 shadow-sm">
+                                                        <h4 className="font-medium text-green-900 dark:text-green-300 mb-3 flex items-center gap-2">
                                                             <TrendingUp className="w-4 h-4" />
                                                             Recent Posts ({prospect.recentPosts.length})
                                                         </h4>
-                                                        <div className="space-y-3">
+                                                        <div className="space-y-4">
                                                             {prospect.recentPosts.slice(0, 3).map((post: Post, index: number) => (
-                                                                <div key={index} className="border border-green-200 rounded-lg p-3">
+                                                                <div key={index} className="border border-green-200 dark:border-green-800/50 rounded-xl p-4 bg-white/50 dark:bg-gray-900/50 shadow-sm hover:border-green-300 dark:hover:border-green-600 transition-colors">
                                                                     <div className="flex items-start justify-between mb-2">
-                                                                        <span className="text-xs text-green-700 font-medium">
+                                                                        <span className="text-xs text-green-700 dark:text-green-400 font-bold uppercase tracking-wider">
                                                                             {post.type?.replace(/_/g, ' ').toLowerCase() || 'Post'}
                                                                         </span>
-                                                                        <span className="text-xs text-green-600">{formatDate(post.timestamp)}</span>
+                                                                        <span className="text-xs text-green-600 dark:text-green-500">{formatDate(post.timestamp)}</span>
                                                                     </div>
-                                                                    <p className="text-sm text-green-800 mb-2">
+                                                                    <p className="text-sm text-green-800 dark:text-green-200 mb-3 line-clamp-3">
                                                                         {post.content || post.postText}
                                                                     </p>
-                                                                    <div className="flex items-center gap-3 text-xs text-green-700">
+                                                                    <div className="flex items-center gap-6 text-xs text-green-700 dark:text-green-400">
                                                                         {post.engagement?.liked && (
-                                                                            <span className="flex items-center gap-1">
+                                                                            <span className="flex items-center gap-1 font-medium">
                                                                                 <Heart className="w-3 h-3 fill-current" />
                                                                                 Liked
                                                                             </span>
                                                                         )}
                                                                         {post.engagement?.commented && (
-                                                                            <span className="flex items-center gap-1">
+                                                                            <span className="flex items-center gap-1 font-medium">
                                                                                 <MessageSquare className="w-3 h-3" />
                                                                                 Commented
                                                                             </span>
@@ -692,13 +694,13 @@ const FlowProspects: React.FC = () => {
                                                                         {post.metrics?.likesCount && post.metrics.likesCount > 0 && (
                                                                             <span className="flex items-center gap-1">
                                                                                 <ThumbsUp className="w-3 h-3" />
-                                                                                {post.metrics.likesCount} likes
+                                                                                {post.metrics.likesCount}
                                                                             </span>
                                                                         )}
                                                                         {post.metrics?.commentsCount && post.metrics.commentsCount > 0 && (
                                                                             <span className="flex items-center gap-1">
                                                                                 <MessageCircle className="w-3 h-3" />
-                                                                                {post.metrics.commentsCount} comments
+                                                                                {post.metrics.commentsCount}
                                                                             </span>
                                                                         )}
                                                                     </div>
@@ -707,7 +709,7 @@ const FlowProspects: React.FC = () => {
                                                                             href={post.url}
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
-                                                                            className="inline-flex items-center gap-1 text-green-700 hover:text-green-900 text-sm mt-2"
+                                                                            className="inline-flex items-center gap-1 text-green-700 dark:text-green-400 hover:text-green-900 dark:hover:text-green-200 text-sm font-semibold mt-3 pt-3 border-t border-green-100 dark:border-green-800/50 w-full"
                                                                         >
                                                                             View Post <ExternalLink className="w-3 h-3" />
                                                                         </a>
@@ -720,21 +722,21 @@ const FlowProspects: React.FC = () => {
 
                                                 {/* Match Information */}
                                                 {prospect.matchReason && (
-                                                    <div className="bg-yellow-50 rounded-lg p-4">
-                                                        <h4 className="font-medium text-yellow-900 mb-2">Match Information</h4>
-                                                        <p className="text-sm text-yellow-800">{prospect.matchReason}</p>
+                                                    <div className="bg-yellow-50 dark:bg-yellow-500/10 rounded-lg p-4 border border-yellow-100 dark:border-yellow-500/20 shadow-sm">
+                                                        <h4 className="font-medium text-yellow-900 dark:text-yellow-300 mb-2">Match Information</h4>
+                                                        <p className="text-sm text-yellow-800 dark:text-yellow-200">{prospect.matchReason}</p>
                                                         {prospect.relevanceFactors && (
-                                                            <div className="mt-2">
-                                                                <p className="text-sm text-yellow-800"><strong>Relevance Factors:</strong></p>
-                                                                <div className="flex flex-wrap gap-1 mt-1">
+                                                            <div className="mt-4">
+                                                                <p className="text-xs font-bold text-yellow-800 dark:text-yellow-400 uppercase tracking-widest mb-2">Relevance Factors:</p>
+                                                                <div className="flex flex-wrap gap-2">
                                                                     {Array.isArray(prospect.relevanceFactors) ? (
                                                                         prospect.relevanceFactors.map((factor: string, index: number) => (
-                                                                            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                                                                            <span key={index} className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border border-yellow-200/50 dark:border-yellow-800/50">
                                                                                 {factor}
                                                                             </span>
                                                                         ))
                                                                     ) : (
-                                                                        <span className="text-xs text-yellow-800">{JSON.stringify(prospect.relevanceFactors)}</span>
+                                                                        <span className="text-xs text-yellow-800 dark:text-yellow-300">{JSON.stringify(prospect.relevanceFactors)}</span>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -744,12 +746,12 @@ const FlowProspects: React.FC = () => {
 
                                                 {/* Profile Link */}
                                                 {prospect.profileUrl && (
-                                                    <div className="text-center">
+                                                    <div className="text-center pt-2">
                                                         <a
                                                             href={prospect.profileUrl}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 hover:text-gray-900 transition-colors"
+                                                            className="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-all font-medium border border-gray-200 dark:border-gray-600 shadow-sm"
                                                         >
                                                             <ExternalLink className="w-4 h-4" />
                                                             View LinkedIn Profile
@@ -792,7 +794,7 @@ const FlowProspects: React.FC = () => {
 
             {/* End of Results */}
             {pagination && !pagination.hasNext && prospects.length > 0 && (
-                <div className="text-center py-4 text-gray-500">
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                     You've reached the end of the prospect list.
                 </div>
             )}

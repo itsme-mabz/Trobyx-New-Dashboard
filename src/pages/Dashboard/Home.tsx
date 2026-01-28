@@ -29,6 +29,8 @@ import MonthlyTarget from "../../components/ecommerce/MonthlyTarget";
 import StatisticsChart from "../../components/ecommerce/StatisticsChart";
 import RecentOrders from "../../components/ecommerce/RecentOrders";
 import PageMeta from "../../components/common/PageMeta";
+import { getUserFlows } from '../../api/flows';
+import Skeleton from '../../components/ui/Skeleton';
 
 const Home = () => {
   const { fetchActiveJobs } = useJobStore();
@@ -41,6 +43,17 @@ const Home = () => {
   const [platformConnections, setPlatformConnections] = useState<any[]>([]);
   const [automations, setAutomations] = useState<any[]>([]);
   const [isLoadingAutomations, setIsLoadingAutomations] = useState(true);
+  const [monthlyEngagements, setMonthlyEngagements] = useState<number[]>(new Array(12).fill(0));
+  const [trobs, setTrobs] = useState<any[]>([]);
+  const [automationFilter, setAutomationFilter] = useState<'flows' | 'trobs'>('flows');
+  const [tableFilter, setTableFilter] = useState<'flows' | 'trobs'>('flows');
+  const [flowStats, setFlowStats] = useState({
+    completedFlowsCount: 0,
+    totalEngagements: 0,
+    totalProspects: 0,
+    connectionsAccepted: 0,
+    recentFlows: [] as any[]
+  });
 
   const fetchPlatformConnections = async () => {
     try {
@@ -59,22 +72,71 @@ const Home = () => {
     }
   };
 
-  const fetchAutomations = async () => {
+  const fetchFlowData = async () => {
     try {
+      setIsLoadingAutomations(true);
       const token = localStorage.getItem('accessToken');
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-      const response = await fetch(`${apiUrl}/api/automation`, {
-        headers: { Authorization: `Bearer ${token}` },
+      // Fetch data from specified endpoints
+      const templateId = 'linkedin-outreach-flow';
+
+      const [activeRes, pausedRes, completedRes, trobsRes] = await Promise.all([
+        getUserFlows({ status: 'ACTIVE', templateId }),
+        getUserFlows({ status: 'PAUSED', templateId }),
+        getUserFlows({ status: 'COMPLETED', templateId }),
+        fetch(`${apiUrl}/api/automation`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then(res => res.ok ? res.json() : { data: { automations: [] } })
+      ]);
+
+      const allFlows = [
+        ...(activeRes.data.flows || []),
+        ...(pausedRes.data.flows || []),
+        ...(completedRes.data.flows || [])
+      ];
+
+      const allTrobs = trobsRes.data.automations || [];
+      setTrobs(allTrobs);
+
+      // Calculate aggregates and monthly distribution
+      let engagements = 0;
+      let prospects = 0;
+      let connections = 0;
+      const monthlyData = new Array(12).fill(0);
+
+      allFlows.forEach(flow => {
+        const stats = flow.state?.prospectTracking;
+        const createdAt = new Date(flow.createdAt);
+        const month = createdAt.getMonth(); // 0-11
+
+        if (stats) {
+          const flowEngagements = stats.totalEngagements || 0;
+          engagements += flowEngagements;
+          prospects += stats.totalProspectsFound || 0;
+          connections += stats.connectionsAccepted || 0;
+
+          // Add to monthly bucket
+          if (month >= 0 && month < 12) {
+            monthlyData[month] += flowEngagements;
+          }
+        }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setAutomations(data.data.automations || []);
-      } else {
-        console.error('Failed to fetch automations');
-      }
+
+      setMonthlyEngagements(monthlyData);
+      setFlowStats({
+        completedFlowsCount: (completedRes.data.flows || []).length,
+        totalEngagements: engagements,
+        totalProspects: prospects,
+        connectionsAccepted: connections,
+        recentFlows: allFlows.sort((a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        ).slice(0, 5)
+      });
+
+      setAutomations(allFlows);
     } catch (error) {
-      console.error('Error fetching automations:', error);
+      console.error('Error fetching flow data:', error);
     } finally {
       setIsLoadingAutomations(false);
     }
@@ -85,7 +147,7 @@ const Home = () => {
     fetchActiveJobs();
     fetchTemplates();
     fetchPlatformConnections();
-    fetchAutomations();
+    fetchFlowData();
   }, [fetchActiveJobs, fetchTemplates]);
 
   // Platform connection status
@@ -120,26 +182,11 @@ const Home = () => {
     return Object.values(grouped);
   };
 
-  // Get unique automations
-  const uniqueAutomations = getUniqueAutomations(automations);
+  // Get unique automations (all inclusive)
+  const uniqueAutomations = getUniqueAutomations([...automations, ...trobs]);
 
-  // Create mock chart data based on automations count
-  const baseCount = uniqueAutomations.length;
-  // This mock data creates a realistic-looking curve that ends near the current user's count
-  const chartData = [
-    Math.max(0, baseCount - 5),
-    Math.max(0, baseCount - 2),
-    Math.max(0, baseCount - 8),
-    Math.max(0, baseCount - 3),
-    Math.max(1, baseCount),
-    Math.max(2, baseCount + 2),
-    Math.max(1, baseCount + 1),
-    Math.max(3, baseCount + 4),
-    Math.max(2, baseCount + 2),
-    Math.max(5, baseCount + 6),
-    Math.max(4, baseCount + 5),
-    Math.max(baseCount + 1, 6)
-  ];
+  // Use the monthly distribution calculated from API data
+  const chartData = monthlyEngagements;
 
   // Onboarding videos
   const onboardingVideos = [
@@ -149,7 +196,6 @@ const Home = () => {
       duration: '3:45',
       thumbnail: '/video-thumbnails/getting-started.jpg',
       url: 'https://docs.trobyx.com/getting-started',
-      isActive: true,
     },
     {
       title: 'LinkedIn Connection Setup',
@@ -157,7 +203,6 @@ const Home = () => {
       duration: '5:20',
       thumbnail: '/video-thumbnails/linkedin-setup.jpg',
       url: 'https://docs.trobyx.com/linkedin-setup',
-      isActive: getPlatformStatus('linkedin') === 'disconnected',
     },
     {
       title: 'Your First Automation',
@@ -165,14 +210,24 @@ const Home = () => {
       duration: '4:15',
       thumbnail: '/video-thumbnails/first-automation.jpg',
       url: 'https://docs.trobyx.com/first-automation',
-      isActive: (uniqueAutomations.length || 0) === 0,
     },
-  ].filter(video => video.isActive);
+  ];
 
-  // Get recent automations (both active and recently completed)
-  const recentAutomations: any[] = [...uniqueAutomations]
-    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 3);
+  // Get recent items based on filter
+  const activeRecentItems: any[] = automationFilter === 'flows'
+    ? [...flowStats.recentFlows]
+    : [...getUniqueAutomations(trobs)]
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5);
+
+  const tableRecentItems: any[] = tableFilter === 'flows'
+    ? [...flowStats.recentFlows]
+    : [...getUniqueAutomations(trobs)]
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5);
+
+  const recentAutomations: any[] = activeRecentItems;
+  const tableRecentAutomations: any[] = tableRecentItems;
 
   // Determine user onboarding state
   const isNewUser = uniqueAutomations.length === 0;
@@ -217,75 +272,85 @@ const Home = () => {
 
           {/* Stats Overview Cards */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
-            <Card>
-              <div className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
-                      Completed Automations
-                    </p>
-                    <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
-                      {completedAutomations}
-                    </p>
-                  </div>
-                  <CheckCircle className='w-8 h-8 text-green-500' />
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
-                      Trob Templates
-                    </p>
-                    <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
-                      {templates.length}
-                    </p>
-                  </div>
-                  <FileText className='w-8 h-8 text-blue-500' />
-                </div>
-              </div>
-            </Card>
-
-            <div
-              className={`relative ${user?.onboardingStep === 3 ? "z-50" : ""}`}
-            >
-              {user?.onboardingStep === 3 && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 z-[9999] whitespace-nowrap animate-fade-in-up">
-                  <div className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-[11px] font-bold py-2.5 px-4 rounded-xl shadow-2xl border border-blue-200 dark:border-gray-700 flex items-center gap-4 relative">
-                    <span>Here is status of your connected account</span>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        useAuthStore.getState().updateOnboarding(4);
-                      }}
-                      className="bg-brand-500 text-white px-2 py-1 rounded-md text-[10px] font-bold hover:bg-brand-600 transition-colors shadow-sm cursor-pointer"
-                    >
-                      OK
-                    </button>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-800 border-r border-b border-blue-200 dark:border-gray-700 rotate-45 -mt-1.5"></div>
-                  </div>
-                </div>
-              )}
-              <Card>
-                <div className='p-6'>
-                  <div className='flex items-center justify-between'>
-                    <div>
-                      <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
-                        Connected Accounts
-                      </p>
-                      <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
-                        {(getPlatformStatus('linkedin') === 'connected' ? 1 : 0) +
-                          (getPlatformStatus('twitter') === 'connected' ? 1 : 0)}
-                      </p>
+            {isLoadingAutomations ? (
+              <>
+                <Card><div className='p-6'><Skeleton className="h-4 w-32 mb-2" /><Skeleton className="h-8 w-16" /></div></Card>
+                <Card><div className='p-6'><Skeleton className="h-4 w-32 mb-2" /><Skeleton className="h-8 w-16" /></div></Card>
+                <Card><div className='p-6'><Skeleton className="h-4 w-32 mb-2" /><Skeleton className="h-8 w-16" /></div></Card>
+              </>
+            ) : (
+              <>
+                <Card>
+                  <div className='p-6'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
+                          Completed Automations
+                        </p>
+                        <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
+                          {flowStats.completedFlowsCount}
+                        </p>
+                      </div>
+                      <CheckCircle className='w-8 h-8 text-green-500' />
                     </div>
-                    <Users className='w-8 h-8 text-indigo-500' />
                   </div>
+                </Card>
+
+                <Card>
+                  <div className='p-6'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
+                          Total Engagements
+                        </p>
+                        <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
+                          {flowStats.totalEngagements}
+                        </p>
+                      </div>
+                      <Target className='w-8 h-8 text-blue-500' />
+                    </div>
+                  </div>
+                </Card>
+
+                <div
+                  className={`relative ${user?.onboardingStep === 3 ? "z-50" : ""}`}
+                >
+                  {user?.onboardingStep === 3 && (
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 z-[9999] whitespace-nowrap animate-fade-in-up">
+                      <div className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-[11px] font-bold py-2.5 px-4 rounded-xl shadow-2xl border border-blue-200 dark:border-gray-700 flex items-center gap-4 relative">
+                        <span>Here is status of your connected account</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            useAuthStore.getState().updateOnboarding(4);
+                          }}
+                          className="bg-brand-500 text-white px-2 py-1 rounded-md text-[10px] font-bold hover:bg-brand-600 transition-colors shadow-sm cursor-pointer"
+                        >
+                          OK
+                        </button>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-800 border-r border-b border-blue-200 dark:border-gray-700 rotate-45 -mt-1.5"></div>
+                      </div>
+                    </div>
+                  )}
+                  <Card>
+                    <div className='p-6'>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <p className='text-gray-600 text-sm font-medium dark:text-gray-400'>
+                            Connected Accounts
+                          </p>
+                          <p className='text-2xl font-bold text-black mt-1 dark:text-white'>
+                            {(getPlatformStatus('linkedin') === 'connected' ? 1 : 0) +
+                              (getPlatformStatus('twitter') === 'connected' ? 1 : 0)}
+                          </p>
+                        </div>
+                        <Users className='w-8 h-8 text-indigo-500' />
+                      </div>
+                    </div>
+                  </Card>
                 </div>
-              </Card>
-            </div>
+              </>
+            )}
           </div>
 
           {/* Two Column Layout */}
@@ -371,16 +436,54 @@ const Home = () => {
               <Card>
                 <Card.Header>
                   <div className='flex items-center justify-between'>
-                    <Card.Title className='text-xl font-bold'>
-                      Your Automations
-                    </Card.Title>
-                    <Link to='/automations'>
-
+                    <div className="flex items-center gap-4">
+                      <Card.Title className='text-xl font-bold'>
+                        Your Automations
+                      </Card.Title>
+                      <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+                        <button
+                          onClick={() => setAutomationFilter('flows')}
+                          className={`px-3 py-1 rounded-md text-xs font-semibold font-bold transition-all ${automationFilter === 'flows'
+                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                            }`}
+                        >
+                          Flows
+                        </button>
+                        <button
+                          onClick={() => setAutomationFilter('trobs')}
+                          className={`px-3 py-1 rounded-md text-xs font-semibold font-bold transition-all ${automationFilter === 'trobs'
+                            ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
+                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                            }`}
+                        >
+                          Trobs
+                        </button>
+                      </div>
+                    </div>
+                    <Link to={automationFilter === 'flows' ? '/flows' : '/automations'}>
+                      <Button size="sm" variant="ghost" endIcon={<ArrowRight size={14} />}>
+                        View All
+                      </Button>
                     </Link>
                   </div>
                 </Card.Header>
                 <Card.Content>
-                  {recentAutomations.length > 0 ? (
+                  {isLoadingAutomations ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="border rounded-lg p-4 dark:border-gray-700">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-5 w-1/2" />
+                              <Skeleton className="h-4 w-1/4" />
+                            </div>
+                            <Skeleton className="h-8 w-24" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : recentAutomations.length > 0 ? (
                     <div className='space-y-4'>
                       {recentAutomations.map((automation: any) => (
                         <div
@@ -389,28 +492,7 @@ const Home = () => {
                         >
                           <div className='flex items-center justify-between'>
                             <div className='flex items-center gap-4 min-w-0 flex-1 mr-4'>
-                              <span
-                                className={`inline-flex flex-shrink-0 items-center px-2 py-0.5 rounded-full text-xs font-medium border ${automation.status === 'active'
-                                  ? 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
-                                  : automation.status === 'completed'
-                                    ? 'bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800'
-                                    : 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700'
-                                  }`}
-                              >
-                                <span
-                                  className={`w-2 h-2 mr-1 rounded-full bg-gradient-to-r ${automation.status === 'active'
-                                    ? 'from-green-400 to-green-600 animate-pulse'
-                                    : automation.status === 'completed'
-                                      ? 'from-indigo-400 to-indigo-600'
-                                      : 'from-gray-400 to-gray-600'
-                                    }`}
-                                ></span>
-                                {automation.status === 'active'
-                                  ? 'Active'
-                                  : automation.status === 'completed'
-                                    ? 'Completed'
-                                    : 'Inactive'}
-                              </span>
+
 
                               <div className='min-w-0 flex-1'>
                                 <h4 className='font-semibold text-black dark:text-white truncate'>
@@ -427,7 +509,7 @@ const Home = () => {
                               </div>
                             </div>
                             <div className='flex items-center gap-3 flex-shrink-0'>
-                              <Link to={`/automations/${automation.id}`}>
+                              <Link to={automationFilter === 'flows' ? `/flows/${automation.id}/analytics` : `/automations/${automation.id}`}>
                                 <Button size='sm' variant='outline' endIcon={<ArrowRight className='w-4 h-4' />}>
                                   View Details
                                 </Button>
@@ -435,7 +517,7 @@ const Home = () => {
                             </div>
                           </div>
 
-                          {automation.status === 'active' && (
+                          {(automation.status === 'active' || automation.status === 'ACTIVE') && (
                             <div className='mt-4'>
                               <div className='flex items-center justify-between text-xs text-gray-600 mb-2 dark:text-gray-400'>
                                 <span>Running</span>
@@ -481,10 +563,32 @@ const Home = () => {
               </Card>
 
               {/* Statistics Chart */}
-              <StatisticsChart data={chartData} title="Automation Activity" />
+              {isLoadingAutomations ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                  <Skeleton className="h-6 w-1/3 mb-6" />
+                  <Skeleton className="h-[250px] w-full" variant="rectangular" />
+                </div>
+              ) : (
+                <StatisticsChart data={chartData} title="Total Social Media Engagement" />
+              )}
 
               {/* Recent Automations Table */}
-              <RecentOrders automations={recentAutomations} />
+              {isLoadingAutomations ? (
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                  <Skeleton className="h-6 w-1/4 mb-4" />
+                  <div className="space-y-4">
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <Skeleton key={i} className="h-12 w-full" />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <RecentOrders
+                  automations={tableRecentAutomations}
+                  filter={tableFilter}
+                  onFilterChange={setTableFilter}
+                />
+              )}
 
             </div>
 

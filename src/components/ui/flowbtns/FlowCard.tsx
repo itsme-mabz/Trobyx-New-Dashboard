@@ -92,10 +92,9 @@ interface FlowCardProps {
     onPause: (flowId: string) => Promise<void>;
     onResume: (flowId: string) => Promise<void>;
     onStop: (flowId: string) => Promise<void>;
-    onExecute: (flowId: string) => Promise<void>;
 }
 
-const FlowCard: React.FC<FlowCardProps> = ({ flow, onPause, onResume, onStop, onExecute }) => {
+const FlowCard: React.FC<FlowCardProps> = ({ flow, onPause, onResume, onStop }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -251,7 +250,7 @@ const FlowCard: React.FC<FlowCardProps> = ({ flow, onPause, onResume, onStop, on
             {/* Action Buttons */}
             <div className="px-5 py-3 bg-gray-50 dark:bg-gray-900/50 rounded-b-lg border-t border-gray-100 dark:border-gray-700">
                 <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
-                    {flow.status === 'ACTIVE' && (
+                    {flow.status?.toUpperCase() === 'ACTIVE' && (
                         <button
                             onClick={() => handleAction(onPause, 'pause')}
                             className="flex items-center gap-1 px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/20 hover:bg-yellow-200 dark:hover:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 rounded-md transition-colors"
@@ -261,7 +260,7 @@ const FlowCard: React.FC<FlowCardProps> = ({ flow, onPause, onResume, onStop, on
                             Pause
                         </button>
                     )}
-                    {flow.status === 'PAUSED' && (
+                    {flow.status?.toUpperCase() === 'PAUSED' && (
                         <button
                             onClick={() => handleAction(onResume, 'resume')}
                             className="flex items-center gap-1 px-3 py-1.5 bg-green-100 dark:bg-green-900/20 hover:bg-green-200 dark:hover:bg-green-900/30 text-green-800 dark:text-green-400 rounded-md transition-colors"
@@ -278,14 +277,6 @@ const FlowCard: React.FC<FlowCardProps> = ({ flow, onPause, onResume, onStop, on
                     >
                         <Trash className="w-3 h-3" />
                         Delete
-                    </button>
-                    <button
-                        onClick={() => handleAction(onExecute, 'execute')}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 dark:bg-blue-900/20 hover:bg-blue-200 dark:hover:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-md transition-colors"
-                        disabled={isLoading}
-                    >
-                        <Play className="w-3 h-3" />
-                        Run Now
                     </button>
 
                     {/* View Options */}

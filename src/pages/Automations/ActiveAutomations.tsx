@@ -356,39 +356,39 @@ const ActiveAutomations: React.FC = () => {
         return (
             <div className='space-y-6'>
                 <div className='animate-pulse'>
-                    <div className='h-8 bg-gray-200 rounded w-1/3 mb-4'></div>
-                    <div className='overflow-hidden rounded-lg border border-gray-200'>
-                        <table className='min-w-full divide-y divide-gray-200'>
-                            <thead className='bg-gray-50'>
+                    <div className='h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4'></div>
+                    <div className='overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800'>
+                        <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-800'>
+                            <thead className='bg-gray-50 dark:bg-gray-900/50'>
                                 <tr>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
                                         Automation
                                     </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
                                         Status
                                     </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
                                         Schedule
                                     </th>
-                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
                                         Actions
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className='bg-white divide-y divide-gray-200'>
+                            <tbody className='bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800'>
                                 {[...Array(5)].map((_, i) => (
-                                    <tr key={i} className='animate-pulse'>
+                                    <tr key={i}>
                                         <td className='px-6 py-4 whitespace-nowrap'>
-                                            <div className='h-4 bg-gray-200 rounded w-3/4'></div>
+                                            <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4'></div>
                                         </td>
                                         <td className='px-6 py-4 whitespace-nowrap'>
-                                            <div className='h-4 bg-gray-200 rounded w-1/2'></div>
+                                            <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2'></div>
                                         </td>
                                         <td className='px-6 py-4 whitespace-nowrap'>
-                                            <div className='h-4 bg-gray-200 rounded w-3/4'></div>
+                                            <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4'></div>
                                         </td>
                                         <td className='px-6 py-4 whitespace-nowrap'>
-                                            <div className='h-4 bg-gray-200 rounded w-1/3'></div>
+                                            <div className='h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3'></div>
                                         </td>
                                     </tr>
                                 ))}
@@ -425,12 +425,12 @@ const ActiveAutomations: React.FC = () => {
 
     return (
         <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4'>
                 <div>
-                    <h1 className='text-2xl font-bold text-gray-900'>
+                    <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
                         Active Automations
                     </h1>
-                    <p className='text-gray-600'>
+                    <p className='text-gray-600 dark:text-gray-400'>
                         Monitor and manage your active automations (
                         {activeAutomations.length} running).
                     </p>
@@ -441,13 +441,13 @@ const ActiveAutomations: React.FC = () => {
                     <div className='flex items-center gap-2 text-xs'>
                         {socketConnected ? (
                             <>
-                                <div className='w-2 h-2 bg-green-500 rounded-full'></div>
-                                <span className='text-green-600'>Live updates</span>
+                                <div className='w-2 h-2 bg-green-500 rounded-full animate-pulse'></div>
+                                <span className='text-green-600 font-medium'>Live updates</span>
                             </>
                         ) : (
                             <>
                                 <div className='w-2 h-2 bg-gray-400 rounded-full'></div>
-                                <span className='text-gray-500'>Offline</span>
+                                <span className='text-gray-500 dark:text-gray-400'>Offline</span>
                             </>
                         )}
                     </div>
@@ -473,57 +473,57 @@ const ActiveAutomations: React.FC = () => {
                     </Card.Content>
                 </Card>
             ) : (
-                <div className='overflow-hidden rounded-lg border border-gray-200'>
-                    <table className='min-w-full divide-y divide-gray-200'>
-                        <thead className='bg-gray-50'>
+                <div className='overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900'>
+                    <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-800'>
+                        <thead className='bg-gray-50 dark:bg-gray-900/50'>
                             <tr>
                                 <th
                                     scope='col'
-                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
                                 >
                                     Automation
                                 </th>
                                 <th
                                     scope='col'
-                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
                                 >
                                     Status
                                 </th>
                                 <th
                                     scope='col'
-                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
                                 >
                                     Schedule
                                 </th>
                                 <th
                                     scope='col'
-                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
+                                    className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
                                 >
                                     Progress
                                 </th>
                                 <th
                                     scope='col'
-                                    className='px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider'
+                                    className='px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'
                                 >
                                     Actions
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className='bg-white divide-y divide-gray-200'>
+                        <tbody className='divide-y divide-gray-200 dark:divide-gray-800'>
                             {activeAutomations.map(automation => (
-                                <tr key={automation.id} className='hover:bg-gray-50'>
+                                <tr key={automation.id} className='hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors'>
                                     <td className='px-6 py-4 whitespace-nowrap'>
                                         <div className='flex items-center'>
-                                            <div className='flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-md bg-blue-100'>
+                                            <div className='flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30'>
                                                 <Badge color={getPlatformColor(automation.platform)}>
                                                     {automation.platform.charAt(0).toUpperCase()}
                                                 </Badge>
                                             </div>
                                             <div className='ml-4'>
-                                                <div className='text-sm font-medium text-gray-900'>
+                                                <div className='text-sm font-medium text-gray-900 dark:text-white'>
                                                     {automation.templateId}
                                                 </div>
-                                                <div className='text-sm text-gray-500'>
+                                                <div className='text-sm text-gray-500 dark:text-gray-400'>
                                                     Created{' '}
                                                     {new Date(automation.createdAt).toLocaleDateString()}
                                                 </div>
@@ -532,22 +532,25 @@ const ActiveAutomations: React.FC = () => {
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
                                         <Badge color={getStatusColor(automation.status)}>
-                                            {automation.status}
+                                            <span className="flex items-center gap-1.5">
+                                                {getStatusIcon(automation.status)}
+                                                {automation.status.charAt(0).toUpperCase() + automation.status.slice(1)}
+                                            </span>
                                         </Badge>
                                         {automation.lastRunAt && (
-                                            <div className='text-xs text-gray-500 mt-1'>
+                                            <div className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
                                                 Last run{' '}
                                                 {new Date(automation.lastRunAt).toLocaleDateString()}
                                             </div>
                                         )}
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
-                                        <div className='text-sm text-gray-900'>
+                                        <div className='text-sm text-gray-900 dark:text-white'>
                                             {automation.interval &&
                                                 `Every ${formatInterval(automation.interval)}`}
                                         </div>
                                         {automation.nextRunAt && (
-                                            <div className='text-xs text-gray-500'>
+                                            <div className='text-xs text-gray-500 dark:text-gray-400'>
                                                 Next:{' '}
                                                 {new Date(automation.nextRunAt).toLocaleDateString()}
                                             </div>
@@ -555,30 +558,30 @@ const ActiveAutomations: React.FC = () => {
                                     </td>
                                     <td className='px-6 py-4 whitespace-nowrap'>
                                         {automation.progress !== undefined ? (
-                                            <div>
-                                                <div className='flex items-center justify-between text-sm text-gray-600 mb-1'>
+                                            <div className="max-w-[150px]">
+                                                <div className='flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1'>
                                                     <span>
                                                         {automation.progress !== undefined
                                                             ? `${Math.round(automation.progress)}%`
-                                                            : 'No progress data'}
+                                                            : 'No data'}
                                                     </span>
                                                 </div>
-                                                <div className='w-full bg-gray-200 rounded-full h-2'>
+                                                <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5'>
                                                     <div
-                                                        className='h-2 rounded-full bg-blue-500 transition-all duration-300'
+                                                        className='h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] transition-all duration-300'
                                                         style={{
                                                             width: `${Math.min(automation.progress || 0, 100)}%`,
                                                         }}
                                                     />
                                                 </div>
                                                 {automation.message && (
-                                                    <div className='text-xs text-gray-500 mt-1'>
+                                                    <div className='text-[10px] text-gray-500 dark:text-gray-400 mt-1 truncate'>
                                                         {automation.message}
                                                     </div>
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className='text-sm text-gray-500'>
+                                            <div className='text-xs text-gray-500 dark:text-gray-400'>
                                                 No progress data
                                             </div>
                                         )}
@@ -589,10 +592,10 @@ const ActiveAutomations: React.FC = () => {
                                                 onClick={() =>
                                                     navigate(`/automations/${automation.id}`)
                                                 }
-                                                className='text-blue-600 flex items-center gap-2 hover:text-blue-900 p-1 rounded hover:bg-blue-50'
+                                                className='text-blue-600 dark:text-blue-400 flex items-center gap-2 hover:text-blue-900 dark:hover:text-blue-300 p-2 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors'
                                                 title='View Details'
                                             >
-                                                <Eye className='w-4 h-4' /> View details
+                                                <Eye className='w-4 h-4' /> <span className="hidden sm:inline">View details</span>
                                             </button>
                                         </div>
                                     </td>

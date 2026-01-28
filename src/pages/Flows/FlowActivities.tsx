@@ -234,21 +234,21 @@ const FlowActivities: React.FC = () => {
     const getActivityColor = (type: string) => {
         switch (type) {
             case 'CONNECTION_SENT':
-                return 'bg-blue-100 text-blue-800 border-blue-200';
+                return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800/50';
             case 'CONNECTION_ACCEPTED':
-                return 'bg-green-100 text-green-800 border-green-200';
+                return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50';
             case 'CONNECTION_DECLINED':
-                return 'bg-red-100 text-red-800 border-red-200';
+                return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50';
             case 'POST_LIKED':
-                return 'bg-pink-100 text-pink-800 border-pink-200';
+                return 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-800/50';
             case 'POST_COMMENTED':
-                return 'bg-purple-100 text-purple-800 border-purple-200';
+                return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800/50';
             case 'MESSAGE_SENT':
-                return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+                return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800/50';
             case 'PROFILE_VIEWED':
-                return 'bg-teal-100 text-teal-800 border-teal-200';
+                return 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-400 dark:border-teal-800/50';
             default:
-                return 'bg-gray-100 text-gray-800 border-gray-200';
+                return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
         }
     };
 
@@ -281,7 +281,7 @@ const FlowActivities: React.FC = () => {
 
     if (loading && activities.length === 0) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex items-center justify-center min-h-[400px] bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
             </div>
         );
@@ -289,10 +289,10 @@ const FlowActivities: React.FC = () => {
 
     if (!flow) {
         return (
-            <div className="text-center py-12">
+            <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
                 <AlertCircle className="w-12 h-12 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Flow not found</h3>
-                <p className="text-gray-600 mb-4">The requested flow could not be found.</p>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Flow not found</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">The requested flow could not be found.</p>
                 <Link to="/flows">
                     <Flowbtn>Back to Flows</Flowbtn>
                 </Link>
@@ -301,9 +301,9 @@ const FlowActivities: React.FC = () => {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pt-2 px-4 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b border-gray-200 dark:border-gray-800 pb-6">
                 <div className="flex items-center gap-4">
                     <Link to={`/flows/${flowId}/analytics`}>
                         <Flowbtn variant="outline" size="sm" className="flex items-center gap-2">
@@ -312,12 +312,12 @@ const FlowActivities: React.FC = () => {
                         </Flowbtn>
                     </Link>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center">
-                            <Activity className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 bg-purple-500/10 dark:bg-purple-500/20 rounded-xl flex items-center justify-center border border-purple-500/20">
+                            <Activity className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-black">Flow Activities</h1>
-                            <p className="text-gray-600 text-sm">{flow.name}</p>
+                            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Flow Activities</h1>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{flow.name}</p>
                         </div>
                     </div>
                 </div>
@@ -337,11 +337,11 @@ const FlowActivities: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 transition-colors">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="Search activities..."
@@ -349,7 +349,7 @@ const FlowActivities: React.FC = () => {
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     setFilters({ ...filters, search: e.target.value })
                                 }
-                                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                             />
                         </div>
                     </div>
@@ -360,7 +360,7 @@ const FlowActivities: React.FC = () => {
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                                 setFilters({ ...filters, type: e.target.value })
                             }
-                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-3 py-2 bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
                         >
                             <option value="">All Types</option>
                             <option value="CONNECTION_SENT">Connection Requests</option>
@@ -386,23 +386,23 @@ const FlowActivities: React.FC = () => {
             {/* Results Summary */}
             {pagination && (
                 <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                         Showing {Math.min((filters.page - 1) * filters.limit + 1, pagination.totalItems)}-
                         {Math.min(filters.page * filters.limit, pagination.totalItems)} of {pagination.totalItems} activities
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                         Page {pagination.currentPage} of {pagination.totalPages}
                     </div>
                 </div>
             )}
 
             {/* Activities List */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-colors">
                 {activities.length === 0 ? (
                     <div className="text-center py-12">
-                        <Activity className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No activities found</h3>
-                        <p className="text-gray-600">
+                        <Activity className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No activities found</h3>
+                        <p className="text-gray-600 dark:text-gray-400">
                             {filters.search || filters.type
                                 ? 'No activities match your current filters.'
                                 : 'No activities have been recorded for this flow yet.'
@@ -410,11 +410,11 @@ const FlowActivities: React.FC = () => {
                         </p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-200">
+                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
                         {activities.map((activity) => (
-                            <div key={activity.id} className="p-4 hover:bg-gray-50 transition-colors">
+                            <div key={activity.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors">
                                 <div className="flex items-start gap-3">
-                                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border ${getActivityColor(activity.type)}`}>
+                                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border shadow-sm ${getActivityColor(activity.type)}`}>
                                         {getActivityIcon(activity.type)}
                                     </div>
 
@@ -422,10 +422,10 @@ const FlowActivities: React.FC = () => {
                                         <div className="flex items-start justify-between">
                                             <div className="min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <h3 className="font-medium text-gray-900 truncate">
+                                                    <h3 className="font-medium text-gray-900 dark:text-white truncate">
                                                         {getTypeLabel(activity.type)}
                                                     </h3>
-                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${getActivityColor(activity.type)}`}>
+                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border shadow-sm ${getActivityColor(activity.type)}`}>
                                                         {activity.wasSuccessful ? (
                                                             <CheckCircle className="w-3 h-3" />
                                                         ) : (
@@ -436,7 +436,7 @@ const FlowActivities: React.FC = () => {
                                                 </div>
 
                                                 {activity.prospect && (
-                                                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-1">
                                                         <span className="truncate">{activity.prospect.name}</span>
                                                         {activity.prospect.company && (
                                                             <span>• {activity.prospect.company}</span>
@@ -447,7 +447,7 @@ const FlowActivities: React.FC = () => {
                                                     </div>
                                                 )}
 
-                                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-500">
                                                     <div className="flex items-center gap-1">
                                                         <Clock className="w-3 h-3" />
                                                         <span>{formatDate(activity.timestamp)}</span>
@@ -460,7 +460,7 @@ const FlowActivities: React.FC = () => {
 
                                             <button
                                                 onClick={() => toggleActivityExpansion(activity.id)}
-                                                className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                                                className="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                             >
                                                 {expandedActivity === activity.id ? (
                                                     <ChevronDown className="w-4 h-4" />
@@ -472,16 +472,16 @@ const FlowActivities: React.FC = () => {
 
                                         {/* Expanded Details */}
                                         {expandedActivity === activity.id && (
-                                            <div className="mt-3 pt-3 border-t border-gray-100 space-y-3">
+                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 space-y-3">
                                                 {/* Connection Details */}
                                                 {activity.connection && (
-                                                    <div className="bg-blue-50 rounded-lg p-3">
-                                                        <h4 className="font-medium text-blue-900 mb-2">Connection Details</h4>
-                                                        <div className="text-sm text-blue-800">
-                                                            <p className="mb-1"><strong>Message:</strong></p>
+                                                    <div className="bg-blue-50 dark:bg-blue-500/10 rounded-lg p-3 border border-transparent dark:border-blue-500/20">
+                                                        <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2">Connection Details</h4>
+                                                        <div className="text-sm text-blue-800 dark:text-blue-200">
+                                                            <p className="mb-1 text-blue-900/70 dark:text-blue-300/70"><strong>Message:</strong></p>
                                                             <p className="whitespace-pre-wrap">{activity.connection.message}</p>
                                                             {activity.connection.requestId && (
-                                                                <p className="mt-1"><strong>Request ID:</strong> {activity.connection.requestId}</p>
+                                                                <p className="mt-1"><strong className="text-blue-900/70 dark:text-blue-300/70">Request ID:</strong> {activity.connection.requestId}</p>
                                                             )}
                                                         </div>
                                                     </div>
@@ -489,12 +489,12 @@ const FlowActivities: React.FC = () => {
 
                                                 {/* Engagement Details */}
                                                 {activity.engagement && (
-                                                    <div className="bg-purple-50 rounded-lg p-3">
-                                                        <h4 className="font-medium text-purple-900 mb-2">Engagement Details</h4>
+                                                    <div className="bg-purple-50 dark:bg-purple-500/10 rounded-lg p-3 border border-transparent dark:border-purple-500/20">
+                                                        <h4 className="font-medium text-purple-900 dark:text-purple-300 mb-2">Engagement Details</h4>
                                                         <div className="space-y-2">
                                                             <div>
-                                                                <p className="text-sm text-purple-800"><strong>Post:</strong></p>
-                                                                <p className="text-sm text-purple-800 whitespace-pre-wrap">
+                                                                <p className="text-sm text-purple-800 dark:text-purple-300/70"><strong>Post:</strong></p>
+                                                                <p className="text-sm text-purple-800 dark:text-purple-200 whitespace-pre-wrap">
                                                                     {activity.engagement.postText || activity.engagement.postUrl}
                                                                 </p>
                                                                 {activity.engagement.postUrl && (
@@ -502,7 +502,7 @@ const FlowActivities: React.FC = () => {
                                                                         href={activity.engagement.postUrl}
                                                                         target="_blank"
                                                                         rel="noopener noreferrer"
-                                                                        className="inline-flex items-center gap-1 text-purple-700 hover:text-purple-900 text-sm mt-1"
+                                                                        className="inline-flex items-center gap-1 text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 text-sm mt-1"
                                                                     >
                                                                         View Post <ExternalLink className="w-3 h-3" />
                                                                     </a>
@@ -510,8 +510,8 @@ const FlowActivities: React.FC = () => {
                                                             </div>
                                                             {activity.engagement.comment && (
                                                                 <div>
-                                                                    <p className="text-sm text-purple-800"><strong>Comment:</strong></p>
-                                                                    <p className="text-sm text-purple-800 whitespace-pre-wrap">{activity.engagement.comment}</p>
+                                                                    <p className="text-sm text-purple-800 dark:text-purple-300/70"><strong>Comment:</strong></p>
+                                                                    <p className="text-sm text-purple-800 dark:text-purple-200 whitespace-pre-wrap">{activity.engagement.comment}</p>
                                                                 </div>
                                                             )}
                                                         </div>
@@ -520,15 +520,15 @@ const FlowActivities: React.FC = () => {
 
                                                 {/* General Details */}
                                                 {activity.details && Object.keys(activity.details).length > 0 && (
-                                                    <div className="bg-gray-50 rounded-lg p-3">
-                                                        <h4 className="font-medium text-gray-900 mb-2">Additional Details</h4>
+                                                    <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-3 border border-gray-100 dark:border-gray-700">
+                                                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">Additional Details</h4>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                             {Object.entries(activity.details).map(([key, value]) => (
                                                                 <div key={key} className="text-sm">
-                                                                    <span className="font-medium text-gray-700 capitalize">
+                                                                    <span className="font-medium text-gray-700 dark:text-gray-400 capitalize">
                                                                         {key.replace(/([A-Z])/g, ' $1').trim()}:
                                                                     </span>{' '}
-                                                                    <span className="text-gray-600">
+                                                                    <span className="text-gray-600 dark:text-gray-300">
                                                                         {typeof value === 'string' && value.length > 100
                                                                             ? `${value.substring(0, 100)}...`
                                                                             : String(value)}
@@ -541,9 +541,9 @@ const FlowActivities: React.FC = () => {
 
                                                 {/* Error Message */}
                                                 {activity.errorMessage && (
-                                                    <div className="bg-red-50 rounded-lg p-3">
-                                                        <h4 className="font-medium text-red-900 mb-1">Error Details</h4>
-                                                        <p className="text-sm text-red-800 whitespace-pre-wrap">{activity.errorMessage}</p>
+                                                    <div className="bg-red-50 dark:bg-red-500/10 rounded-lg p-3 border border-transparent dark:border-red-500/20">
+                                                        <h4 className="font-medium text-red-900 dark:text-red-300 mb-1">Error Details</h4>
+                                                        <p className="text-sm text-red-800 dark:text-red-200 whitespace-pre-wrap">{activity.errorMessage}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -582,7 +582,7 @@ const FlowActivities: React.FC = () => {
 
             {/* End of Results */}
             {pagination && !pagination.hasNext && activities.length > 0 && (
-                <div className="text-center py-4 text-gray-500">
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
                     You've reached the end of the activity feed.
                 </div>
             )}

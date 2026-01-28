@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
     Search,
     Workflow,
     Clock,
-    TrendingUp,
     Filter,
     Plus,
     Activity,
@@ -26,8 +25,7 @@ import {
     getUserFlows,
     pauseFlow,
     resumeFlow,
-    deleteFlow,
-    executeFlow
+    deleteFlow
 } from '../../api/flows';
 
 import { toast } from 'react-hot-toast';
@@ -90,7 +88,6 @@ type StatusFilterType = 'all' | FlowStatus;
 type PlatformFilterType = 'all' | Platform;
 
 const Flows: React.FC = () => {
-    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('available');
     const [flows, setFlows] = useState<UserFlow[]>([]);
     const [flowTemplates, setFlowTemplates] = useState<FlowTemplate[]>([]);
@@ -155,9 +152,8 @@ const Flows: React.FC = () => {
 
     const fetchUserFlows = async (): Promise<void> => {
         try {
-            // Updated to fetch only specific active flows for the running tab as requested
+            // Fetch all flows for the specific template to show both active and paused states
             const params: Record<string, string> = {
-                status: 'ACTIVE',
                 templateId: 'linkedin-outreach-flow'
             };
 
@@ -194,15 +190,15 @@ const Flows: React.FC = () => {
 
     const handleStopFlow = async (flowId: string): Promise<void> => {
         toast((t) => (
-            <div className="flex flex-col gap-3 min-w-[300px]">
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col gap-4 min-w-[320px]">
                 <div className="flex items-start gap-3">
                     <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-full flex-shrink-0">
                         <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Stop Flow?</h3>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Delete Flow?</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                            Are you sure you want to stop this flow? This action cannot be undone.
+                            Are you sure you want to delete this flow? This action cannot be undone.
                         </p>
                     </div>
                 </div>
@@ -218,31 +214,28 @@ const Flows: React.FC = () => {
                             toast.dismiss(t.id);
                             try {
                                 await deleteFlow(flowId);
-                                toast.success('Flow stopped successfully');
-                                fetchUserFlows(); // Refresh the list
+                                // Optimistic UI update: Remove the flow from state immediately
+                                setFlows(prev => prev.filter(f => f.id !== flowId));
+                                toast.success('Flow deleted successfully');
+                                // fetchUserFlows(); // Re-fetch to sync with server just in case
                             } catch (error) {
-                                toast.error('Failed to stop flow');
+                                toast.error('Failed to delete flow');
                             }
                         }}
                         className="px-3 py-1.5 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
                     >
-                        Stop Flow
+                        Delete Flow
                     </button>
                 </div>
             </div>
         ), {
             duration: Infinity,
-            className: 'dark:bg-gray-800 dark:border dark:border-gray-700',
+            style: {
+                background: 'none',
+                boxShadow: 'none',
+                padding: 0,
+            },
         });
-    };
-
-    const handleExecuteFlow = async (flowId: string): Promise<void> => {
-        try {
-            await executeFlow(flowId);
-            toast.success('Flow execution started');
-        } catch (error) {
-            toast.error('Failed to execute flow');
-        }
     };
 
     const handleRefreshTemplates = async (): Promise<void> => {
@@ -271,11 +264,15 @@ const Flows: React.FC = () => {
         return matchesSearch && matchesPlatform;
     });
 
-    // Filter user flows based on search and status
+    // Filter user flows based on search and status (Exclude STOPPED flows)
     const filteredFlows = flows.filter(flow => {
         const matchesSearch = flow.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             flow.template?.displayName?.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesSearch;
+
+        // Keep only ACTIVE, PAUSED, and COMPLETED flows in the running tab
+        const isRunning = ['ACTIVE', 'PAUSED', 'COMPLETED'].includes(flow.status);
+
+        return matchesSearch && isRunning;
     });
 
     // Get platform icon
@@ -367,9 +364,9 @@ const Flows: React.FC = () => {
                             }`}
                     >
                         Available Flows
-                        {flowTemplates.length > 0 && (
+                        {filteredTemplates.length > 0 && (
                             <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${activeTab === 'available' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
-                                {flowTemplates.length}
+                                {filteredTemplates.length}
                             </span>
                         )}
                     </button>
@@ -381,9 +378,9 @@ const Flows: React.FC = () => {
                             }`}
                     >
                         Running Flows
-                        {flows.length > 0 && (
+                        {filteredFlows.length > 0 && (
                             <span className={`ml-2 py-0.5 px-2 rounded-full text-xs ${activeTab === 'active' ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
-                                {flows.length}
+                                {filteredFlows.length}
                             </span>
                         )}
                     </button>
@@ -563,7 +560,6 @@ const Flows: React.FC = () => {
                                     onPause={handlePauseFlow}
                                     onResume={handleResumeFlow}
                                     onStop={handleStopFlow}
-                                    onExecute={handleExecuteFlow}
                                 />
                             ))}
                         </div>

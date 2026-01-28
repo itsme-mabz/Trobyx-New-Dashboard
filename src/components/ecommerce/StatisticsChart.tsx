@@ -16,28 +16,36 @@ export default function StatisticsChart({ data = [], title = "Automation Trends"
     chart: {
       fontFamily: "Outfit, sans-serif",
       height: 310,
-      type: "area",
+      type: "bar",
       toolbar: {
         show: false,
       },
     },
-    stroke: {
-      curve: "smooth",
-      width: [2],
-    },
-    fill: {
-      type: "gradient",
-      gradient: {
-        opacityFrom: 0.55,
-        opacityTo: 0,
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "40%",
+        borderRadius: 5,
+        borderRadiusApplication: 'end',
       },
     },
-    markers: {
-      size: 0,
-      strokeColors: "#fff",
-      strokeWidth: 2,
-      hover: {
-        size: 6,
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent']
+    },
+    fill: {
+      opacity: 1,
+      type: "gradient",
+      gradient: {
+        shade: "light",
+        type: "vertical",
+        shadeIntensity: 0.25,
+        gradientToColors: undefined,
+        inverseColors: true,
+        opacityFrom: 1,
+        opacityTo: 0.85,
+        stops: [50, 0, 100],
       },
     },
     grid: {
@@ -51,20 +59,24 @@ export default function StatisticsChart({ data = [], title = "Automation Trends"
           show: true,
         },
       },
+      borderColor: "#E5E7EB",
+      strokeDashArray: 4,
     },
     dataLabels: {
       enabled: false,
     },
     tooltip: {
       enabled: true,
-      x: {
-        format: "dd MMM",
+      theme: "light",
+      style: {
+        fontSize: "12px",
+        fontFamily: "Outfit, sans-serif",
       },
     },
     xaxis: {
       type: "category",
       categories: [
-        "J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
       ],
       axisBorder: {
         show: false,
@@ -72,12 +84,18 @@ export default function StatisticsChart({ data = [], title = "Automation Trends"
       axisTicks: {
         show: false,
       },
+      labels: {
+        style: {
+          fontSize: "12px",
+          colors: "#6B7280",
+        },
+      },
     },
     yaxis: {
       labels: {
         style: {
           fontSize: "12px",
-          colors: ["#6B7280"],
+          colors: "#6B7280",
         },
       },
     },
@@ -85,7 +103,7 @@ export default function StatisticsChart({ data = [], title = "Automation Trends"
 
   const series = [
     {
-      name: "Automations",
+      name: "Engagements",
       data: chartData,
     },
   ];
@@ -105,7 +123,7 @@ export default function StatisticsChart({ data = [], title = "Automation Trends"
 
       <div className="max-w-full overflow-x-auto custom-scrollbar">
         <div className="min-w-full">
-          <Chart options={options} series={series} type="area" height={310} />
+          <Chart options={options} series={series} type="bar" height={310} />
         </div>
       </div>
     </div>

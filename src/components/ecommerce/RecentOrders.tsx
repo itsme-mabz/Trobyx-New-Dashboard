@@ -9,17 +9,47 @@ import Badge from "../ui/badge/Badge";
 
 
 
-export default function RecentOrders({ automations = [] }: { automations?: any[] }) {
+export default function RecentOrders({
+  automations = [],
+  filter = 'flows',
+  onFilterChange
+}: {
+  automations?: any[],
+  filter?: 'flows' | 'trobs',
+  onFilterChange?: (filter: 'flows' | 'trobs') => void
+}) {
   // If no automations provided, fallback to empty array or show a message
   const displayData = automations.length > 0 ? automations : [];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pb-3 pt-4 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+        <div className="flex items-center gap-4">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
             Recent Automations
           </h3>
+          {onFilterChange && (
+            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+              <button
+                onClick={() => onFilterChange('flows')}
+                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${filter === 'flows'
+                    ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                  }`}
+              >
+                Flows
+              </button>
+              <button
+                onClick={() => onFilterChange('trobs')}
+                className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${filter === 'trobs'
+                    ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+                  }`}
+              >
+                Trobs
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className="max-w-full overflow-x-auto">

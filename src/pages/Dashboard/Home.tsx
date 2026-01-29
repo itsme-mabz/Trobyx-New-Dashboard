@@ -461,11 +461,7 @@ const Home = () => {
                         </button>
                       </div>
                     </div>
-                    <Link to={automationFilter === 'flows' ? '/flows' : '/automations'}>
-                      <Button size="sm" variant="ghost" endIcon={<ArrowRight size={14} />}>
-                        View All
-                      </Button>
-                    </Link>
+                    
                   </div>
                 </Card.Header>
                 <Card.Content>

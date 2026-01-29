@@ -42,7 +42,8 @@ export default function UserSecurityCard() {
 
         const promise = (async () => {
             const token = localStorage.getItem('accessToken');
-            const response = await fetch('/api/users/change-password', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+            const response = await fetch(`${apiUrl}/api/users/change-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,8 +96,9 @@ export default function UserSecurityCard() {
 
         try {
             const token = localStorage.getItem('accessToken');
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
 
-            const response = await fetch('/api/users/account', {
+            const response = await fetch(`${apiUrl}/api/users/account`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',

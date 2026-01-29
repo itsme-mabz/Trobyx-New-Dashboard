@@ -21,7 +21,8 @@ const ForgotPassword = () => {
         setError('');
 
         try {
-            const response = await fetch('/api/auth/forgot-password', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+            const response = await fetch(`${apiUrl}/api/auth/forgot-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,7 +59,7 @@ const ForgotPassword = () => {
                         <p className="text-sm text-gray-500 mb-6">
                             Didn't receive the email? Check your spam folder or try again.
                         </p>
-                        <Link to="/signin">
+                        <Link to="/login">
                             <Button className="w-full">
                                 Back to Sign In
                             </Button>
@@ -130,7 +131,7 @@ const ForgotPassword = () => {
 
                     <div className="mt-6 text-center">
                         <Link
-                            to="/signin"
+                            to="/login"
                             className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-500"
                         >
                             <ArrowLeft size={16} />

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Search, Star, Clock, TrendingUp, Users, Zap, FileText, Linkedin, Twitter, Instagram, Globe, LucideIcon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, Star, Clock, TrendingUp, Users, Zap, FileText, Linkedin, Twitter, Instagram, Globe, LucideIcon, AlertCircle } from 'lucide-react';
 import useTemplateStore from '../../stores/useTemplateStore';
 import Button from '../../components/ui/button/Button';
+import useAuthStore from '../../stores/useAuthStore';
+import { toast } from 'react-hot-toast';
+import Flowbtn from '../../components/ui/flowbtns/Flowbtn';
 
 // Type definitions
 interface Template {
@@ -41,6 +44,8 @@ interface TemplateStore {
 }
 
 const Trobs = () => {
+    const navigate = useNavigate();
+    const { user, isLoading: isAuthLoading } = useAuthStore();
     const {
         templates,
         filters,
@@ -51,11 +56,52 @@ const Trobs = () => {
     } = useTemplateStore() as TemplateStore;
 
     const [popularTemplates, setPopularTemplates] = useState<PopularTemplate[]>([]);
+    const [isResending, setIsResending] = useState(false);
+    const [resendSuccess, setResendSuccess] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
+
+    // Cooldown timer
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout>;
+        if (resendCooldown > 0) {
+            timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+        }
+        return () => clearTimeout(timer);
+    }, [resendCooldown]);
 
     useEffect(() => {
-        fetchTemplates();
-        fetchPopularTemplates();
-    }, [fetchTemplates]);
+        if (!isAuthLoading && user?.emailVerified) {
+            fetchTemplates();
+            fetchPopularTemplates();
+        }
+    }, [fetchTemplates, isAuthLoading, user?.emailVerified]);
+
+    const handleResendVerification = async () => {
+        if (!user?.email || resendCooldown > 0) return;
+
+        setIsResending(true);
+        try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+            const response = await fetch(`${apiUrl}/api/auth/resend-verification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email }),
+            });
+
+            if (response.ok) {
+                setResendCooldown(30);
+                setResendSuccess(true);
+                toast.success("Verification email resent!");
+            } else {
+                const data = await response.json();
+                toast.error(data.message || "Failed to resend email");
+            }
+        } catch (err) {
+            toast.error("An error occurred. Please try again.");
+        } finally {
+            setIsResending(false);
+        }
+    };
 
     const fetchPopularTemplates = async () => {
         try {
@@ -110,6 +156,98 @@ const Trobs = () => {
 
     // Get available platforms dynamically
     const availablePlatforms = [...new Set(templates.map(t => t.platform))].filter(Boolean);
+
+    // Final Access Check
+    if (isAuthLoading) return null;
+
+    if (user && !user.emailVerified) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 animate-in fade-in zoom-in duration-500">
+                <div className="w-full max-w-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-8 lg:p-12 shadow-2xl relative overflow-hidden text-center">
+                    {/* Decorative Background Elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 -mr-16 -mt-16 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-500/5 -ml-16 -mb-16 rounded-full blur-3xl"></div>
+
+                    {resendSuccess ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-10 h-10 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Check your email!</h2>
+                            <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                We've sent a new verification link to <strong>{user.email}</strong>.<br />
+                                Please verify your account to access our pre-built automations.
+                            </p>
+                            <div className="flex flex-col gap-3">
+                                <Flowbtn onClick={() => setResendSuccess(false)} className="w-full py-3">
+                                    Back to Requirements
+                                </Flowbtn>
+                                <button
+                                    onClick={handleResendVerification}
+                                    disabled={resendCooldown > 0 || isResending}
+                                    className={`text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors ${resendCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    {resendCooldown > 0 ? `Resend again in ${resendCooldown}s` : "Didn't receive it? Resend"}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="relative mb-8">
+                                <div className="w-20 h-20 bg-brand-500/10 dark:bg-brand-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 transform transition-transform hover:scale-110">
+                                    <Zap className="w-10 h-10 text-brand-500 dark:text-brand-400" />
+                                </div>
+                                <div className="absolute -top-2 right-[35%] w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center shadow-sm border border-amber-200 dark:border-amber-800">
+                                    <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-500" />
+                                </div>
+                            </div>
+
+                            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                                Account Verification Required
+                            </h2>
+
+                            <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                To maintain security and prevent abuse, please verify your email address before accessing our automation templates.
+                            </p>
+
+                            <div className="space-y-4 mb-8">
+                                <div className="flex items-start gap-3 text-left p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                                    <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Verify Your Email</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Click the button below to receive a new verification link in your inbox.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                <Flowbtn
+                                    onClick={handleResendVerification}
+                                    disabled={isResending || resendCooldown > 0}
+                                    className="w-full py-3 shadow-lg shadow-brand-500/20"
+                                >
+                                    {isResending ? "Sending..." : "Send Verification Email"}
+                                </Flowbtn>
+                                <Flowbtn
+                                    variant="outline"
+                                    onClick={() => navigate('/')}
+                                    className="w-full py-3"
+                                >
+                                    Return to Dashboard
+                                </Flowbtn>
+                            </div>
+                        </>
+                    )}
+
+                    <p className="mt-8 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
+                        Trobyx AI Automations
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6 pt-4 px-4 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -266,19 +404,18 @@ const Trobs = () => {
                 </p>
             </div>
 
-            {/* Templates List - 2 Per Row */}
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[...Array(6)].map((_, i) => (
-                        <div key={i} className="bg-white border border-tea-black-200 rounded-lg p-4">
+                        <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 animate-pulse">
                             <div className="flex items-center justify-between mb-3">
-                                <div className="w-16 h-5 bg-tea-black-200 rounded"></div>
-                                <div className="w-12 h-4 bg-tea-black-200 rounded"></div>
+                                <div className="w-16 h-5 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                <div className="w-12 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
                             </div>
-                            <div className="w-3/4 h-5 bg-tea-black-200 rounded mb-2"></div>
-                            <div className="w-full h-4 bg-tea-black-200 rounded mb-1"></div>
-                            <div className="w-2/3 h-4 bg-tea-black-200 rounded mb-4"></div>
-                            <div className="w-full h-8 bg-tea-black-200 rounded"></div>
+                            <div className="w-3/4 h-5 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                            <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded mb-1"></div>
+                            <div className="w-2/3 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+                            <div className="w-full h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
                         </div>
                     ))}
                 </div>

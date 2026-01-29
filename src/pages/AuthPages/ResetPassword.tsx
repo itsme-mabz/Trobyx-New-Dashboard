@@ -63,7 +63,8 @@ const ResetPassword = () => {
         setError('');
 
         try {
-            const response = await fetch('/api/auth/reset-password', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+            const response = await fetch(`${apiUrl}/api/auth/reset-password`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,7 +81,7 @@ const ResetPassword = () => {
                 setIsSuccess(true);
                 // Redirect to login after success
                 setTimeout(() => {
-                    navigate('/signin', {
+                    navigate('/login', {
                         state: {
                             message: 'Password reset successful! Please sign in with your new password.',
                         },
@@ -126,7 +127,7 @@ const ResetPassword = () => {
                         <p className="text-sm text-gray-500 mb-6">
                             Redirecting you to the sign-in page...
                         </p>
-                        <Link to="/signin">
+                        <Link to="/login">
                             <Button>
                                 Go to Sign In
                             </Button>
@@ -249,7 +250,7 @@ const ResetPassword = () => {
 
                     <div className="mt-6 text-center">
                         <Link
-                            to="/signin"
+                            to="/login"
                             className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-500"
                         >
                             <ArrowLeft size={16} />

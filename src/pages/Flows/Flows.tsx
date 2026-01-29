@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Search,
     Workflow,
@@ -29,6 +29,7 @@ import {
 } from '../../api/flows';
 
 import { toast } from 'react-hot-toast';
+import useAuthStore from '../../stores/useAuthStore';
 
 // Type definitions
 type FlowStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'FAILED' | 'PENDING';
@@ -88,6 +89,8 @@ type StatusFilterType = 'all' | FlowStatus;
 type PlatformFilterType = 'all' | Platform;
 
 const Flows: React.FC = () => {
+    const navigate = useNavigate();
+    const { user, isLoading: isAuthLoading } = useAuthStore();
     const [activeTab, setActiveTab] = useState<TabType>('available');
     const [flows, setFlows] = useState<UserFlow[]>([]);
     const [flowTemplates, setFlowTemplates] = useState<FlowTemplate[]>([]);
@@ -96,7 +99,19 @@ const Flows: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState<StatusFilterType>('all');
     const [platformFilter, setPlatformFilter] = useState<PlatformFilterType>('all');
     const [showInfoBanner, setShowInfoBanner] = useState<boolean>(false);
+    const [isResending, setIsResending] = useState(false);
+    const [resendSuccess, setResendSuccess] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
     const infoBannerRef = useRef<HTMLDivElement>(null);
+
+    // Cooldown timer for resending verification
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout>;
+        if (resendCooldown > 0) {
+            timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+        }
+        return () => clearTimeout(timer);
+    }, [resendCooldown]);
 
     // Close info banner when clicking outside
     useEffect(() => {
@@ -125,17 +140,21 @@ const Flows: React.FC = () => {
             }
         };
 
-        loadData();
-    }, []);
+        if (!isAuthLoading && user && user.plan === 'PLUS' && user.emailVerified) {
+            loadData();
+        }
+    }, [isAuthLoading, user]);
 
     // Refresh data when tab changes (without loading spinner)
     useEffect(() => {
-        if (activeTab === 'available') {
-            fetchFlowTemplates();
-        } else {
-            fetchUserFlows();
+        if (!isAuthLoading && user && user.plan === 'PLUS' && user.emailVerified) {
+            if (activeTab === 'available') {
+                fetchFlowTemplates();
+            } else {
+                fetchUserFlows();
+            }
         }
-    }, [activeTab]);
+    }, [activeTab, isAuthLoading, user]);
 
     const fetchFlowTemplates = async (): Promise<void> => {
         try {
@@ -275,8 +294,35 @@ const Flows: React.FC = () => {
         return matchesSearch && isRunning;
     });
 
+    const handleResendVerification = async () => {
+        if (!user?.email || resendCooldown > 0) return;
+
+        setIsResending(true);
+        try {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+            const response = await fetch(`${apiUrl}/api/auth/resend-verification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email }),
+            });
+
+            if (response.ok) {
+                setResendCooldown(30);
+                setResendSuccess(true);
+                toast.success("Verification email resent!");
+            } else {
+                const data = await response.json();
+                toast.error(data.message || "Failed to resend email");
+            }
+        } catch (err) {
+            toast.error("An error occurred. Please try again.");
+        } finally {
+            setIsResending(false);
+        }
+    };
+
     // Get platform icon
-    const getPlatformIcon = (platform: string | undefined): LucideIcon => {
+    const getPlatformIcon = (platform: Platform): LucideIcon => {
         switch (platform?.toLowerCase()) {
             case 'linkedin': return Linkedin;
             case 'twitter': return Twitter;
@@ -288,6 +334,113 @@ const Flows: React.FC = () => {
 
     // Get available platforms from templates
     const availablePlatforms = [...new Set(flowTemplates.map(t => t.platform))].filter(Boolean) as Platform[];
+
+    // Final Access Check
+    if (user && (user.plan !== 'PLUS' || !user.emailVerified)) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 animate-in fade-in zoom-in duration-500">
+                <div className="w-full max-w-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-8 lg:p-12 shadow-2xl relative overflow-hidden text-center">
+                    {/* Decorative Background Elements */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/5 -mr-16 -mt-16 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-500/5 -ml-16 -mb-16 rounded-full blur-3xl"></div>
+
+                    {resendSuccess ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <svg className="w-10 h-10 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Check your email!</h2>
+                            <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                We've sent a new verification link to <strong>{user.email}</strong>.<br />
+                                Please verify your account to unlock Smart Flows.
+                            </p>
+                            <div className="flex flex-col gap-3">
+                                <Flowbtn onClick={() => setResendSuccess(false)} className="w-full py-3">
+                                    Back to Requirements
+                                </Flowbtn>
+                                <button
+                                    onClick={handleResendVerification}
+                                    disabled={resendCooldown > 0 || isResending}
+                                    className={`text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors ${resendCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    {resendCooldown > 0 ? `Resend again in ${resendCooldown}s` : "Didn't receive it? Resend"}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="relative mb-8">
+                                <div className="w-20 h-20 bg-brand-500/10 dark:bg-brand-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 transform transition-transform hover:scale-110">
+                                    <Workflow className="w-10 h-10 text-brand-600 dark:text-brand-400" />
+                                </div>
+                                <div className="absolute -top-2 right-[35%] w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center shadow-sm border border-amber-200 dark:border-amber-800">
+                                    <Zap className="w-4 h-4 text-amber-600 dark:text-amber-500" />
+                                </div>
+                            </div>
+
+                            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                                Unlock AI Smart Flows
+                            </h2>
+
+                            <div className="space-y-4 mb-8">
+                                {user.plan !== 'PLUS' && (
+                                    <div className="flex items-start gap-3 text-left p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <Activity className="w-5 h-5 text-brand-600 dark:text-brand-400 shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-semibold text-gray-900 dark:text-white">Upgrade to PLUS Plan</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Smart Flows are high-tier automation sequences reserved for our Plus members.</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!user.emailVerified && (
+                                    <div className="flex items-start gap-3 text-left p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-gray-100 dark:border-gray-700">
+                                        <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                                        <div>
+                                            <p className="text-sm font-semibold text-gray-900 dark:text-white">Verify Your Email</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">To maintain security, please verify your email address before accessing advanced automation.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex flex-col gap-3">
+                                {user.plan !== 'PLUS' ? (
+                                    <Flowbtn
+                                        onClick={() => navigate('/pricing')}
+                                        className="w-full py-3 shadow-lg shadow-brand-500/20"
+                                    >
+                                        Upgrade to PLUS
+                                    </Flowbtn>
+                                ) : (
+                                    <Flowbtn
+                                        onClick={handleResendVerification}
+                                        disabled={isResending || resendCooldown > 0}
+                                        className="w-full py-3 shadow-lg shadow-brand-500/20"
+                                    >
+                                        {isResending ? "Sending..." : "Send Verification Email"}
+                                    </Flowbtn>
+                                )}
+                                <Flowbtn
+                                    variant="outline"
+                                    onClick={() => navigate('/')}
+                                    className="w-full py-3"
+                                >
+                                    Return to Dashboard
+                                </Flowbtn>
+                            </div>
+                        </>
+                    )}
+
+                    <p className="mt-8 text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-bold">
+                        Trobyx AI Automations
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4 pt-2 px-4 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
@@ -424,8 +577,33 @@ const Flows: React.FC = () => {
 
             {/* Loading State */}
             {isLoading && (
-                <div className="flex items-center justify-center py-20">
-                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 dark:border-gray-700 border-t-brand-600 dark:border-t-brand-400" />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 shadow-sm animate-pulse">
+                            <div className="flex items-start gap-5">
+                                <div className="w-20 h-20 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                                <div className="flex-1 space-y-3">
+                                    <div className="flex gap-2">
+                                        <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                                        <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                                    </div>
+                                    <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded" />
+                                    <div className="space-y-2">
+                                        <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded" />
+                                        <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded" />
+                                    </div>
+                                    <div className="flex gap-4 pt-2">
+                                        <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
+                                        <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 mt-6">
+                                <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                                <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 

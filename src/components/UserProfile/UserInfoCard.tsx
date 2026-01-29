@@ -19,7 +19,9 @@ export default function UserInfoCard() {
     username: '',
     email: '',
     phone: '',
-    bio: ''
+    bio: '',
+    li_at: '',
+    JSESSIONID: ''
   });
 
   useEffect(() => {
@@ -29,8 +31,10 @@ export default function UserInfoCard() {
         lastName: user.lastName || '',
         username: user.username || '',
         email: user.email || '',
-        phone: user.phone || '', // Assuming phone might be added later
-        bio: user.bio || ''     // Assuming bio might be added later
+        phone: user.phone || '',
+        bio: user.bio || '',
+        li_at: user.li_at || '',
+        JSESSIONID: user.JSESSIONID || ''
       });
     }
   }, [isOpen, user]);
@@ -41,7 +45,8 @@ export default function UserInfoCard() {
 
     const promise = (async () => {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('/api/users/profile', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+      const response = await fetch(`${apiUrl}/api/users/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -51,6 +56,8 @@ export default function UserInfoCard() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           username: formData.username,
+          li_at: formData.li_at,
+          JSESSIONID: formData.JSESSIONID,
         }),
       });
 
@@ -85,14 +92,14 @@ export default function UserInfoCard() {
   };
 
   return (
-    <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+    <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-8 min-h-[300px]">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+        <div className="flex-1">
           <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
             Personal Information
           </h4>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-8 lg:gap-y-12">
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 First Name
@@ -131,6 +138,8 @@ export default function UserInfoCard() {
 
 
           </div>
+
+
         </div>
 
         <button
@@ -156,8 +165,8 @@ export default function UserInfoCard() {
         </button>
       </div>
 
-      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
-        <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+      <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[600px] m-4">
+        <div className="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
           <div className="px-2 pr-14">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Edit Personal Information
@@ -167,7 +176,7 @@ export default function UserInfoCard() {
             </p>
           </div>
           <form onSubmit={handleSave} className="flex flex-col">
-            <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
+            <div className="custom-scrollbar h-auto overflow-y-auto px-2 pb-3">
               <div>
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   Personal Information
@@ -211,6 +220,8 @@ export default function UserInfoCard() {
                     />
                   </div>
                 </div>
+
+
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">

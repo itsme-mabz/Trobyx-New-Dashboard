@@ -5,6 +5,7 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import useAuthStore from "../../stores/useAuthStore";
+import toast from "react-hot-toast";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -92,6 +93,39 @@ export default function SignUpForm() {
     }
   };
 
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
+  const handleResendVerification = async () => {
+    if (resendCooldown > 0) return;
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
+      const response = await fetch(`${apiUrl}/api/auth/resend-verification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      });
+
+      if (response.ok) {
+        setResendCooldown(30); // 60s cooldown
+        toast.success("Verification email resent!");
+      } else {
+        const data = await response.json();
+        toast.error(data.message || "Failed to resend email");
+      }
+    } catch (err) {
+      toast.error("An error occurred. Please try again.");
+    }
+  };
+
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full min-h-[400px] text-center">
@@ -106,13 +140,21 @@ export default function SignUpForm() {
           We've sent a verification link to <strong>{formData.email}</strong>.<br />
           Please click the link in the email to verify your account.
         </p>
-        <Link
-          to="/signin"
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-brand-500 bg-brand-50 rounded-lg hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 transition-colors"
-          onClick={() => setIsSuccess(false)}
-        >
-          Back to Sign In
-        </Link>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <Link
+            to="/login"
+            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-brand-500 bg-brand-50 rounded-lg hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 transition-colors"
+          >
+            Back to Sign In
+          </Link>
+          <button
+            onClick={handleResendVerification}
+            disabled={resendCooldown > 0}
+            className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700/50 transition-colors ${resendCooldown > 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Email'}
+          </button>
+        </div>
       </div>
     )
   }
@@ -269,7 +311,7 @@ export default function SignUpForm() {
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Already have an account? {""}
                 <Link
-                  to="/signin"
+                  to="/login"
                   className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                 >
                   Sign In

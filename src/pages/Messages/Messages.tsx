@@ -974,13 +974,18 @@ function Messages() {
                         )}
                     </div>
                     <div className='flex items-center gap-4'>
-                        {selectedContact?.conversation_url && (
+                        {selectedContact && (
                             <a
-                                href={selectedContact?.conversation_url}
+                                href={selectedContact.other_participant_id
+                                    ? `https://www.linkedin.com/in/${selectedContact.other_participant_id}/`
+                                    : selectedContact.profile_urn
+                                        ? `https://www.linkedin.com/in/${selectedContact.profile_urn.split(':').pop()}/`
+                                        : '#'
+                                }
                                 target='_blank'
                                 rel='noopener noreferrer'
                                 className='bg-[#0a66c2] text-white font-semibold p-1.5 sm:px-3 sm:py-1.5 rounded-lg flex items-center gap-1.5 transition-colors hover:bg-[#004182] focus:outline-none transition-all flex-shrink-0'
-                                title="View on LinkedIn"
+                                title="View LinkedIn Profile"
                             >
                                 <Linkedin className='w-4 h-4' />
                                 <span className='hidden sm:inline text-xs'>View Profile</span>

@@ -153,58 +153,118 @@ const TrobDetail = () => {
     useEffect(() => {
         if (trobId === 'linkedin-follower-extractor' || trobId === 'linkedin-connections-export') {
             const fetchCookies = async () => {
-                const token = localStorage.getItem('accessToken');
                 try {
-                    const baseUrl = import.meta.env.VITE_API_URL || 'http://192.168.1.56:3000';
-                    const connResponse = await fetch(`${baseUrl}/api/platform-connections`, {
-                        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-                    });
+                    console.log('🔍 Fetching LinkedIn cookies for trob:', trobId);
+                    const response = await fetch('http://192.168.1.23:3000/api/platform-connections');
 
-                    if (connResponse.ok) {
-                        const connData = await connResponse.json();
-                        const connectionsList = Array.isArray(connData) ? connData : (connData.data || connData.connections || []);
-                        const linkedinConn = connectionsList.find((c: any) =>
-                            (c.platform?.toUpperCase() === 'LINKEDIN') && (c.isActive || c.connected)
-                        );
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('📦 Platform connections response:', data);
 
-                        if (linkedinConn && linkedinConn.cookies) {
-                            let cookieData = linkedinConn.cookies;
-                            if (typeof cookieData === 'string') {
-                                try {
-                                    cookieData = JSON.parse(cookieData);
-                                } catch (e) {
-                                    console.error('Failed to parse cookies string', e);
+                        if (data.success && data.data && data.data.length > 0) {
+                            // Find all active LinkedIn connections and sort by updatedAt descending
+                            const linkedinConnections = data.data
+                                .filter((conn: any) => conn.platform === 'LINKEDIN' && conn.isActive)
+                                .sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+
+                            console.log('🔗 LinkedIn connections found:', linkedinConnections.length);
+
+                            const linkedinConnection = linkedinConnections[0];
+
+                            if (linkedinConnection && linkedinConnection.cookies) {
+                                console.log('✅ Found active LinkedIn connection');
+                                let cookieData = linkedinConnection.cookies;
+
+                                if (typeof cookieData === 'string') {
+                                    try {
+                                        cookieData = JSON.parse(cookieData);
+                                    } catch (e) {
+                                        console.error('Failed to parse cookies string', e);
+                                    }
                                 }
-                            }
 
-                            let extractedCookies = {
-                                JSESSIONID: '',
-                                li_at: '',
-                                profile_urn: 'urn:li:fsd_profile:ACoAAEpWar4B_9DNsjLkDzGYCy8N5AChqrcrDq0'
-                            };
-                            if (Array.isArray(cookieData)) {
-                                const jsession = cookieData.find((c: any) => c.name === 'JSESSIONID');
-                                const liAt = cookieData.find((c: any) => c.name === 'li_at');
-                                extractedCookies.JSESSIONID = jsession?.value?.replace(/"/g, '').trim() || '';
-                                extractedCookies.li_at = liAt?.value?.replace(/"/g, '').trim() || '';
-                            } else if (typeof cookieData === 'object' && cookieData !== null) {
-                                extractedCookies.JSESSIONID = (cookieData.JSESSIONID || '').replace(/"/g, '').trim();
-                                extractedCookies.li_at = (cookieData.li_at || '').replace(/"/g, '').trim();
-                            }
+                                let jsessionid: string | null = null;
+                                let li_at: string | null = null;
 
-                            console.log('✅ PRE-LOADED LinkedIn Cookies for verification:');
-                            console.log('JSESSIONID:', extractedCookies.JSESSIONID);
-                            console.log('li_at:', extractedCookies.li_at);
-                            setLinkedinCookies(extractedCookies);
+                                if (Array.isArray(cookieData)) {
+                                    const jsessionCookie = cookieData.find((c: any) => c.name === 'JSESSIONID');
+                                    const liAtCookie = cookieData.find((c: any) => c.name === 'li_at');
+                                    jsessionid = jsessionCookie?.value?.replace(/"/g, '') || null;
+                                    li_at = liAtCookie?.value?.replace(/"/g, '') || null;
+                                } else if (typeof cookieData === 'object' && cookieData !== null) {
+                                    jsessionid = (cookieData.JSESSIONID || '').replace(/"/g, '').trim();
+                                    li_at = (cookieData.li_at || '').replace(/"/g, '').trim();
+                                }
+
+                                if (jsessionid && li_at) {
+                                    console.log('✅ Successfully extracted cookies');
+                                    console.log('JSESSIONID:', jsessionid ? '✓ Found' : '✗ Missing');
+                                    console.log('li_at:', li_at ? '✓ Found' : '✗ Missing');
+
+                                    setLinkedinCookies({
+                                        JSESSIONID: jsessionid,
+                                        li_at: li_at,
+                                        profile_urn: 'urn:li:fsd_profile:ACoAAEpWar4B_9DNsjLkDzGYCy8N5AChqrcrDq0'
+                                    });
+                                } else {
+                                    console.warn('⚠️ Cookies incomplete:', {
+                                        JSESSIONID: jsessionid ? 'Present' : 'Missing',
+                                        li_at: li_at ? 'Present' : 'Missing'
+                                    });
+                                }
+                            } else {
+                                console.warn('⚠️ No cookies found in LinkedIn connection');
+                            }
+                        } else {
+                            console.warn('⚠️ No platform connections data in response');
                         }
+                    } else {
+                        console.error('❌ Failed to fetch platform connections:', response.status);
                     }
                 } catch (err) {
-                    console.error('Failed to pre-load LinkedIn cookies:', err);
+                    console.error('❌ Failed to pre-load LinkedIn cookies:', err);
                 }
             };
             fetchCookies();
         }
     }, [trobId]);
+
+    // Also try to get cookies from the connection object when it's available
+    useEffect(() => {
+        if (connection && connection.cookies && (trobId === 'linkedin-follower-extractor' || trobId === 'linkedin-connections-export')) {
+            console.log('🔄 Attempting to load cookies from connection object');
+            let cookieData = connection.cookies;
+
+            if (typeof cookieData === 'string') {
+                try {
+                    cookieData = JSON.parse(cookieData);
+                } catch (e) {
+                    console.error('Failed to parse cookies from connection object', e);
+                }
+            }
+
+            let extractedCookies = {
+                JSESSIONID: '',
+                li_at: '',
+                profile_urn: 'urn:li:fsd_profile:ACoAAEpWar4B_9DNsjLkDzGYCy8N5AChqrcrDq0'
+            };
+
+            if (Array.isArray(cookieData)) {
+                const jsession = cookieData.find((c: any) => c.name === 'JSESSIONID');
+                const liAt = cookieData.find((c: any) => c.name === 'li_at');
+                extractedCookies.JSESSIONID = jsession?.value?.replace(/"/g, '').trim() || '';
+                extractedCookies.li_at = liAt?.value?.replace(/"/g, '').trim() || '';
+            } else if (typeof cookieData === 'object' && cookieData !== null) {
+                extractedCookies.JSESSIONID = (cookieData.JSESSIONID || '').replace(/"/g, '').trim();
+                extractedCookies.li_at = (cookieData.li_at || '').replace(/"/g, '').trim();
+            }
+
+            if (extractedCookies.JSESSIONID && extractedCookies.li_at) {
+                console.log('✅ Successfully loaded cookies from connection object');
+                setLinkedinCookies(extractedCookies);
+            }
+        }
+    }, [connection, trobId]);
 
     const handleConfigChange = (path: string, value: any) => {
         setConfig(prev => {
@@ -292,8 +352,18 @@ const TrobDetail = () => {
                     : 'http://192.168.1.23:5000/api/followers';
 
                 if (!linkedinCookies.li_at || !linkedinCookies.JSESSIONID) {
-                    toast.error('LinkedIn session not found. Please connect your LinkedIn account.');
+                    console.error('❌ LinkedIn cookies missing:', {
+                        li_at: linkedinCookies.li_at ? 'Present' : 'Missing',
+                        JSESSIONID: linkedinCookies.JSESSIONID ? 'Present' : 'Missing'
+                    });
+                    toast.error('LinkedIn session not found. Please connect your LinkedIn account from the Connections page.');
                     setIsStarting(false);
+                    // Optionally navigate to connections page
+                    setTimeout(() => {
+                        if (window.confirm('Would you like to go to the Connections page to connect your LinkedIn account?')) {
+                            navigate('/connections');
+                        }
+                    }, 1000);
                     return;
                 }
 
@@ -431,7 +501,7 @@ const TrobDetail = () => {
     const handleConnectPlatform = () => {
         setShowConnectionModal(false);
         // Navigate to platforms page or open extension guide
-        navigate('/platforms');
+        navigate('/connections');
     };
 
     const renderConfigField = (key: string, field: ConfigField, value: any, path: string = key) => {

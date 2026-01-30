@@ -388,7 +388,7 @@ const Home = () => {
                             </p>
                           </div>
                           {!hasConnectedPlatforms && (
-                            <Link to='/platforms'>
+                            <Link to='/connections'>
                               <Button size='sm'>Connect</Button>
                             </Link>
                           )}
@@ -547,7 +547,7 @@ const Home = () => {
                             Browse Templates
                           </Button>
                         </Link>
-                        <Link to='/platforms'>
+                        <Link to='/connections'>
                           <Button variant='outline' className='w-full sm:w-auto' startIcon={<Users className='w-4 h-4' />}>
                             Connect Platforms
                           </Button>

@@ -225,7 +225,7 @@ const Pricing: React.FC = () => {
         }
       } else {
         // Handle paid plan - redirect to Stripe Checkout
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/billing/create-checkout-session`, {
+        const response = await fetch(`'http://localhost:3000'}/api/billing/create-checkout-session`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

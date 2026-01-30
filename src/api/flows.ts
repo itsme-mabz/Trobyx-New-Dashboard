@@ -141,7 +141,7 @@ export const startFlow = async (
   config: Record<string, any>,
   name: string | null = null
 ): Promise<ApiResponse<{ flow: UserFlow }>> => {
-  const FLOW_API_URL = 'http://192.168.1.56:3000/api/flows';
+  const FLOW_API_URL = 'http://192.168.1.23:3000/api/flows';
   const token = localStorage.getItem('accessToken');
 
   const response = await fetch(FLOW_API_URL, {
@@ -182,7 +182,7 @@ export const getUserFlows = async (
 
   const queryString = queryParams.toString();
   // Use specific endpoint for fetching flows
-  const url = `http://192.168.1.56:3000/api/flows${queryString ? `?${queryString}` : ''}`;
+  const url = `http://192.168.1.23:3000/api/flows${queryString ? `?${queryString}` : ''}`;
 
   const response = await fetch(url, {
     method: 'GET',
@@ -217,7 +217,7 @@ export const getFlow = (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>
  */
 export const pauseFlow = async (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>> => {
   const token = localStorage.getItem('accessToken');
-  const url = `http://192.168.1.56:3000/api/flows/${flowId}/pause`;
+  const url = `http://192.168.1.23:3000/api/flows/${flowId}/pause`;
 
   const response = await fetch(url, {
     method: 'PUT',
@@ -243,7 +243,7 @@ export const pauseFlow = async (flowId: string): Promise<ApiResponse<{ flow: Use
  */
 export const resumeFlow = async (flowId: string): Promise<ApiResponse<{ flow: UserFlow }>> => {
   const token = localStorage.getItem('accessToken');
-  const url = `http://192.168.1.56:3000/api/flows/${flowId}/resume`;
+  const url = `http://192.168.1.23:3000/api/flows/${flowId}/resume`;
 
   const response = await fetch(url, {
     method: 'PUT',
@@ -270,7 +270,7 @@ export const resumeFlow = async (flowId: string): Promise<ApiResponse<{ flow: Us
 export const deleteFlow = async (flowId: string): Promise<ApiResponse> => {
   const token = localStorage.getItem('accessToken');
   // Use specific endpoint for flow deletion
-  const url = `http://192.168.1.56:3000/api/flows/${flowId}`;
+  const url = `http://192.168.1.23:3000/api/flows/${flowId}`;
 
   const response = await fetch(url, {
     method: 'DELETE',

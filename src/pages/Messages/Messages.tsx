@@ -132,7 +132,7 @@ function Messages() {
     // Function to fetch and use platform cookies from database
     const fetchAndUsePlatformCookies = useCallback(async (): Promise<LinkedInCredentials | null> => {
         try {
-            const response = await fetch('http://192.168.1.56:3000/api/platform-connections');
+            const response = await fetch('http://192.168.1.23:3000/api/platform-connections');
             if (response.ok) {
                 const data = await response.json();
 

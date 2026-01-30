@@ -492,7 +492,7 @@ const AppSidebar: React.FC = () => {
           </div>
         </nav>
 
-        <div className="mt-auto">
+        <div className="mt-auto pb-6 2xl:pb-24">
           <nav className="mb-6 !overflow-visible">
             {renderMenuItems(
               othersItems.filter(item => item.name !== "Sign Out" || isMobileOpen),

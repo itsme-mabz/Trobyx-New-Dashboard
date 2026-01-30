@@ -471,7 +471,7 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar !overflow-x-visible">
+      <div className="flex-1 flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar !overflow-x-visible">
         <nav className="mb-6 !overflow-visible">
           <div className="flex flex-col gap-4 !overflow-visible">
             <div className="!overflow-visible">
@@ -489,13 +489,18 @@ const AppSidebar: React.FC = () => {
               </h2>
               {renderMenuItems(navItems, "main")}
             </div>
+          </div>
+        </nav>
+
+        <div className="mt-auto">
+          <nav className="mb-6 !overflow-visible">
             {renderMenuItems(
               othersItems.filter(item => item.name !== "Sign Out" || isMobileOpen),
               "others"
             )}
-          </div>
-        </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+          </nav>
+          {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        </div>
       </div>
     </aside>
   );
